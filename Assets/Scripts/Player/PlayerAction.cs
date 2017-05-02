@@ -27,7 +27,7 @@ static class Constants
     public const float MassDistance = 2.2f; //マスの距離
 }
 //アニメーション
-enum ANIMATION { RUN, JUMP, ATTACK, SUPERRUN, SUPERJUMP, SUPERATTACK, OVER };
+enum ANIMATION { RUN, JUMP, ATTACK, OVER };
 public class PlayerAction : MonoBehaviour
 {
     private int effect_count = 0;   //エフェクト再生用のカウント
@@ -97,7 +97,7 @@ public class PlayerAction : MonoBehaviour
 
         //}
         //走っている場合
-        if (animationFlag[(int)ANIMATION.RUN] || animationFlag[(int)ANIMATION.SUPERRUN])
+        if (animationFlag[(int)ANIMATION.RUN] )
         {
             if (isGround)       //地面についている
                 middlePosition.y = transform.position.y;    //中央地点yを今のプレイヤーの座標にする
@@ -135,8 +135,8 @@ public class PlayerAction : MonoBehaviour
             if (animationFlag[(int)ANIMATION.ATTACK] == true)
                 PlayerAttack(i, Constants.Attack);
             //superAttack
-            if (animationFlag[(int)ANIMATION.SUPERATTACK] == true)
-                PlayerAttack(i, Constants.SuperAttack);
+            //if (animationFlag[(int)ANIMATION.SUPERATTACK] == true)
+            //    PlayerAttack(i, Constants.SuperAttack);
             //バグったとき用
             //if (enemy[i].transform.position.x - transform.position.x <= Constants.MassDistance && transform.position.y > enemy[i].transform.position.y && enemy[i].transform.position.y - transform.position.y >= -0.5f)
             //{
@@ -190,8 +190,8 @@ public class PlayerAction : MonoBehaviour
     public bool IsIdle()
     {
         //待機中の場合
-        if (animationFlag[(int)ANIMATION.RUN] == false && animationFlag[(int)ANIMATION.JUMP] == false && animationFlag[(int)ANIMATION.ATTACK] == false &&
-            animationFlag[(int)ANIMATION.SUPERRUN] == false && animationFlag[(int)ANIMATION.SUPERJUMP] == false && animationFlag[(int)ANIMATION.SUPERATTACK] == false)
+        if (animationFlag[(int)ANIMATION.RUN] == false && animationFlag[(int)ANIMATION.JUMP] == false && animationFlag[(int)ANIMATION.ATTACK] == false)// &&
+           // animationFlag[(int)ANIMATION.SUPERRUN] == false && animationFlag[(int)ANIMATION.SUPERJUMP] == false && animationFlag[(int)ANIMATION.SUPERATTACK] == false)
         {
             idleFlag = true;
         }
@@ -243,26 +243,26 @@ public class PlayerAction : MonoBehaviour
                     break;
                 //スーパーシリーズ//
                 //superRun
-                case (int)ANIMATION.SUPERRUN:
-                    //1.5マス進む
-                    middlePosition = new Vector3(middlePosition.x + nextPosition.x, middlePosition.y, 0);
-                    //3マス進む
-                    endPosition = new Vector3(endPosition.x + nextPosition.x * 2, endPosition.y, 0);
-                    break;
-                //superJump
-                case (int)ANIMATION.SUPERJUMP:
-                    //middlePosにjumpPowを足す
-                    middlePosition = new Vector3(middlePosition.x + nextPosition.x / 2, middlePosition.y += jumpPower * 2, 0);
-                    //2マス進む
-                    endPosition = new Vector3(endPosition.x + nextPosition.x, endPosition.y, 0);
-                    break;
-                //superAttack
-                case (int)ANIMATION.SUPERATTACK:
-                    //移動しない
-                    middlePosition = new Vector3(transform.position.x, middlePosition.y, 0);
-                    //移動しない
-                    endPosition = new Vector3(transform.position.x, endPosition.y, 0);
-                    break;
+                //case (int)ANIMATION.SUPERRUN:
+                //    //1.5マス進む
+                //    middlePosition = new Vector3(middlePosition.x + nextPosition.x, middlePosition.y, 0);
+                //    //3マス進む
+                //    endPosition = new Vector3(endPosition.x + nextPosition.x * 2, endPosition.y, 0);
+                //    break;
+                ////superJump
+                //case (int)ANIMATION.SUPERJUMP:
+                //    //middlePosにjumpPowを足す
+                //    middlePosition = new Vector3(middlePosition.x + nextPosition.x / 2, middlePosition.y += jumpPower * 2, 0);
+                //    //2マス進む
+                //    endPosition = new Vector3(endPosition.x + nextPosition.x, endPosition.y, 0);
+                //    break;
+                ////superAttack
+                //case (int)ANIMATION.SUPERATTACK:
+                //    //移動しない
+                //    middlePosition = new Vector3(transform.position.x, middlePosition.y, 0);
+                //    //移動しない
+                //    endPosition = new Vector3(transform.position.x, endPosition.y, 0);
+                //    break;
 
             }
 
@@ -350,24 +350,24 @@ public class PlayerAction : MonoBehaviour
                     break;
 
                 // スーパーシリーズ //
-                //superMove
-                case CardManagement.CardType.SuperMove:
-                    cardSetFlag = true;                         //カードセットフラグ
-                    animationNum = (int)ANIMATION.SUPERRUN;     //アニメーションの番号
-                    animationName = "Run";                      //アニメーションの名前
-                    break;
-                //superJump
-                case CardManagement.CardType.SuperJump:
-                    cardSetFlag = true;                         //カードセットフラグ
-                    animationNum = (int)ANIMATION.SUPERJUMP;    //アニメーションの番号
-                    animationName = "Jump";                     //アニメーションの名前
-                    break;
-                //superAttack
-                case CardManagement.CardType.SuperAttack:
-                    cardSetFlag = true;                         //カードセットフラグ
-                    animationNum = (int)ANIMATION.SUPERATTACK;  //アニメーションの番号
-                    animationName = "Attack";                   //アニメーションの名前
-                    break;
+                ////superMove
+                //case CardManagement.CardType.SuperMove:
+                //    cardSetFlag = true;                         //カードセットフラグ
+                //    animationNum = (int)ANIMATION.SUPERRUN;     //アニメーションの番号
+                //    animationName = "Run";                      //アニメーションの名前
+                //    break;
+                ////superJump
+                //case CardManagement.CardType.SuperJump:
+                //    cardSetFlag = true;                         //カードセットフラグ
+                //    animationNum = (int)ANIMATION.SUPERJUMP;    //アニメーションの番号
+                //    animationName = "Jump";                     //アニメーションの名前
+                //    break;
+                ////superAttack
+                //case CardManagement.CardType.SuperAttack:
+                //    cardSetFlag = true;                         //カードセットフラグ
+                //    animationNum = (int)ANIMATION.SUPERATTACK;  //アニメーションの番号
+                //    animationName = "Attack";                   //アニメーションの名前
+                //    break;
 
                 //finish
                 case CardManagement.CardType.Finish:
@@ -413,7 +413,7 @@ public class PlayerAction : MonoBehaviour
         //ゴール
         if (hit.gameObject.tag == "Goal")
         {
-            // 五秒後にゲームオーバー
+            // 五秒後にクリア
             GameObject.Find("GameManager").GetComponent<ToResultScene>().ToClear(5);
         }
         //トゲ
