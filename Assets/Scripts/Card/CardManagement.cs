@@ -19,9 +19,9 @@ public class CardManagement : MonoBehaviour {
     public GameObject moveCard;
     public GameObject jumpCard;
     public GameObject attackCard;
-    public GameObject superMoveCard;
-    public GameObject superJumpCard;
-    public GameObject superAttackCard;
+    //public GameObject superMoveCard;
+    //public GameObject superJumpCard;
+    //public GameObject superAttackCard;
     public GameObject finishCard;
     Vector2 cardSize;
 
@@ -40,9 +40,9 @@ public class CardManagement : MonoBehaviour {
         Move,
         Jump,
         Attack,
-        SuperMove,
-        SuperJump,
-        SuperAttack,
+        //SuperMove,
+        //SuperJump,
+        //SuperAttack,
         Finish,
         Nothing,
         NumType
@@ -285,23 +285,23 @@ public class CardManagement : MonoBehaviour {
                                     && bord.GetCardType(bord.selectedSpace) == tuckCard.back.type)
                                 {
                                     // カードの効果を変える
-                                    CardBord.CardData newCard;
-                                    newCard.type = DecideTuckCard(tuckCard.front.type, tuckCard.back.type);
-                                    newCard.obj = null;
-                                    CreateCards(ref newCard);
-                                    if (newCard.obj != null)
+                                   // CardBord.CardData newCard;
+                                    //newCard.type = DecideTuckCard(tuckCard.front.type, tuckCard.back.type);
+                                    //newCard.obj = null;
+                                    //CreateCards(ref newCard);
+                                    //if (newCard.obj != null)
                                     {
-                                        // 挟まれたカードの削除
-                                        bord.DeleteCard(bord.selectedSpace);
-                                        // 上記の位置に新しいカード
-                                        bord.TuckCard(newCard, bord.selectedSpace);
+                                        //// 挟まれたカードの削除
+                                        //bord.DeleteCard(bord.selectedSpace);
+                                        //// 上記の位置に新しいカード
+                                        //bord.TuckCard(newCard, bord.selectedSpace);
                                     }
-                                    else
+                                    //else
                                     {
                                         bord.TuckCard(tuckCard.front, bord.selectedSpace);
                                         bord.TuckCard(tuckCard.back, bord.selectedSpace + 2);
                                     }
-                                    Destroy(newCard.obj);
+                                    //Destroy(newCard.obj);
 
                                 }
                                 else
@@ -348,15 +348,15 @@ public class CardManagement : MonoBehaviour {
                 case CardType.Attack:
                     card.obj = Instantiate(attackCard);
                     break;
-                case CardType.SuperMove:
-                    card.obj = Instantiate(superMoveCard);
-                    break;
-                case CardType.SuperJump:
-                    card.obj = Instantiate(superJumpCard);
-                    break;
-                case CardType.SuperAttack:
-                    card.obj = Instantiate(superAttackCard);
-                    break;
+                //case CardType.SuperMove:
+                //    card.obj = Instantiate(superMoveCard);
+                //    break;
+                //case CardType.SuperJump:
+                //    card.obj = Instantiate(superJumpCard);
+                //    break;
+                //case CardType.SuperAttack:
+                //    card.obj = Instantiate(superAttackCard);
+                //    break;
                 case CardType.Finish:
                     card.obj = Instantiate(finishCard);
                     break;
@@ -401,16 +401,16 @@ public class CardManagement : MonoBehaviour {
         const int back = 10;
         switch ((int)type + (int)type1 * back)
         {
-            // 仮
-            case (int)CardType.Move + (int)CardType.Move * back:
-                result = CardType.SuperMove;
-                break;
-            case (int)CardType.Jump + (int)CardType.Jump * back:
-                result = CardType.SuperJump;
-                break;
-            case (int)CardType.Attack + (int)CardType.Attack * back:
-                result = CardType.SuperAttack;
-                break;
+            //// 仮
+            //case (int)CardType.Move + (int)CardType.Move * back:
+            //    result = CardType.SuperMove;
+            //    break;
+            //case (int)CardType.Jump + (int)CardType.Jump * back:
+            //    result = CardType.SuperJump;
+            //    break;
+            //case (int)CardType.Attack + (int)CardType.Attack * back:
+            //    result = CardType.SuperAttack;
+            //    break;
             default:
                 result = CardType.Nothing;
                 break;
