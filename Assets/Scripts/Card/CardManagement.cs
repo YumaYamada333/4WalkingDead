@@ -94,6 +94,9 @@ public class CardManagement : MonoBehaviour {
     // Rayに触れたオブジェクト
     RaycastHit[] hit;
 
+    // カウントダウン判定フラグ
+    private bool countDownFlag = false; 
+
     // Use this for initialization
     void Start () {
         isUpdateData = true;
@@ -198,6 +201,8 @@ public class CardManagement : MonoBehaviour {
             posInterval = handsBordSize.x / numTypeHold;
 
         //isUpdateData = false;
+        if (countDownFlag)
+            countDownFlag = false;
     }
 
     // カード操作
@@ -279,6 +284,7 @@ public class CardManagement : MonoBehaviour {
                             if (bord.cards[i].obj.transform.position == select_card.transform.position)
                             {
                                 bord.selectedSpace = i;
+                                countDownFlag = true;
 
                                 // 挟んだカードが同タイプ
                                 if (bord.GetCardType(bord.selectedSpace) == tuckCard.front.type
@@ -437,5 +443,11 @@ public class CardManagement : MonoBehaviour {
             bord.usingCard = 0;
             return bord.GetCardType();
         }
+    }
+
+    // カウントダウンフラグの状態を取得
+    public bool GetCountDownFlag()
+    {
+        return countDownFlag;
     }
 }
