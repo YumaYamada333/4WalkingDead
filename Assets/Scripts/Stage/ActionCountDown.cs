@@ -82,7 +82,7 @@ public class ActionCountDown : MonoBehaviour {
 
     //フラグ
     private bool m_old_flag = false;
-    private bool m_action_flag = true;
+    private bool m_action_flag = false;
 
     //アクションの種類
     [SerializeField]
@@ -115,11 +115,15 @@ public class ActionCountDown : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-        //アクションがnullでないなら
+        //カウントダウン
+        GetCountZero();
+
+        //アクションがnullでないならアクションを行う
         if (action != null)
         {
             //フラグが立ったらアクションの準備
-            if (m_action_flag != m_old_flag)
+            if (m_action_flag == true && 
+                m_action_flag != m_old_flag)
             {
                 action.Preparation(ref obj);
                 m_old_flag = m_action_flag;
@@ -129,6 +133,18 @@ public class ActionCountDown : MonoBehaviour {
             action.Execute(ref obj);
 
         }
+    }
+
+    //カウントダウンによってフラグをあげる
+    void GetCountZero()
+    {
+        //カウントが0になり、いままで一度もフラグが立っていなかったらフラグをあげる
+        if (obj.GetComponent<CountDown>().GetCount() == 0 &&
+            m_old_flag == false)
+        {
+            m_action_flag = true;
+        }
+      
     }
 
     //アクションフラグを返す
