@@ -95,7 +95,10 @@ public class CardManagement : MonoBehaviour {
     RaycastHit[] hit;
 
     // カウントダウン判定フラグ
-    private bool countDownFlag = false; 
+    private bool countDownFlag = false;
+
+    //初期所持カード判断ステージ番号
+    public int stageNum;
 
     // Use this for initialization
     void Start () {
@@ -116,15 +119,32 @@ public class CardManagement : MonoBehaviour {
         numCardSet = 0;
         numSetting = 0;
         selectedCard = 0;
+        stageNum = 1;
 
         cursor = CursorForcusTag.HandsBord;
 
-        // 仮所持カード
-        SetCard(CardType.Attack, CardType.Attack, 10);
-        SetCard(CardType.Move, CardType.Move);
-        SetCard(CardType.Jump, CardType.Jump);
-        SetCard(CardType.Jump, CardType.Jump);
-        
+        //所持カードの設定
+        switch (stageNum)
+        {
+            case 1:
+                // 仮所持カード
+                SetCard(CardType.Attack, CardType.Attack);
+                SetCard(CardType.Attack, CardType.Attack);
+                SetCard(CardType.Attack, CardType.Attack);
+                SetCard(CardType.Attack, CardType.Attack);
+                SetCard(CardType.Jump, CardType.Jump);
+                SetCard(CardType.Jump, CardType.Jump);
+                SetCard(CardType.Jump, CardType.Jump);
+                break;
+        }
+
+
+        //// 仮所持カード
+        //SetCard(CardType.Attack, CardType.Attack, 10);
+        //SetCard(CardType.Move, CardType.Move);
+        //SetCard(CardType.Jump, CardType.Jump);
+        //SetCard(CardType.Jump, CardType.Jump);
+
 
         // ステージの仮のmoveカード配置
         CardBord bord = actionBord.GetComponent<CardBord>();
@@ -170,7 +190,7 @@ public class CardManagement : MonoBehaviour {
             }
 
             // 残り枚数のUIの更新
-            cards[i].numUI.GetComponent<TextMesh>().text = cards[i].numHold.ToString();
+            //cards[i].numUI.GetComponent<TextMesh>().text = cards[i].numHold.ToString();
 
             if (cursor == CursorForcusTag.HandsBord)
             {
@@ -179,7 +199,7 @@ public class CardManagement : MonoBehaviour {
             }
 
             // UIの配置
-            cards[i].numUI.transform.position = cards[i].back.obj.transform.position;
+            //cards[i].numUI.transform.position = cards[i].back.obj.transform.position;
         }
         numSetting = 0;
     }
