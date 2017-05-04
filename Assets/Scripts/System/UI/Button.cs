@@ -14,6 +14,9 @@ public class Button : MonoBehaviour {
     // ボタン
     private GameObject SpeedButton;
     private GameObject ExecutionButton;
+    //リセットボタン
+    private GameObject ResetButton;
+
     //private float BordPosition_x;
     //private float BordPosition_y;
     //private float BordPosition_z;
@@ -35,6 +38,9 @@ public class Button : MonoBehaviour {
         //ResetButton = GameObject.Find("ResetButton");
         SpeedButton = GameObject.Find("SpeedButton");
         ExecutionButton = GameObject.Find("PlayButton");
+        //リセットボタン
+        ResetButton = GameObject.Find("Reset");
+
         //SetPosition_x = 11.0f;
         //SetPosition_y = 2.0f;
         //SetPosition_z = 1.2f;
@@ -83,6 +89,9 @@ public class Button : MonoBehaviour {
             SpeedButton.SetActive(false);
             ExecutionButton.SetActive(false);
             otherCamera.SetActive(true);
+            //リセットボタン
+            ResetButton.SetActive(true);
+
             //RetuneButton.SetActive(true);
             //ResetButton.SetActive(true);
 
@@ -103,6 +112,9 @@ public class Button : MonoBehaviour {
             SpeedButton.SetActive(true);
             ExecutionButton.SetActive(true);
             otherCamera.SetActive(false);
+            //リセットボタン
+            ResetButton.SetActive(false);
+
             //RetuneButton.SetActive(false);
             //ResetButton.SetActive(false);
 

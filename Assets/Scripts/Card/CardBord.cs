@@ -74,7 +74,7 @@ public class CardBord : MonoBehaviour {
     }
 
     //カードの初期座標取得関数
-    void Coordinate()
+    public void Coordinate()
     {
 
         centerCard = usingCard;

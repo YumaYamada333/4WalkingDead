@@ -32,7 +32,7 @@ public class CardManagement : MonoBehaviour {
     int numCardSet;
 
     // カード最大の所持数
-    const int numMax = 99;  
+    public const int numMax = 99;  
 
     // カードの種類
     public enum CardType
@@ -49,7 +49,7 @@ public class CardManagement : MonoBehaviour {
     }
 
     // カードの種類数配列を確保
-    struct CardData
+    public struct CardData
     {
         // 前のカード 後ろのカード
         public CardBord.CardData front;
@@ -59,7 +59,7 @@ public class CardManagement : MonoBehaviour {
         // 所持数
         public int numHold;
     }
-    CardData[] cards = new CardData[numMax];
+    public CardData[] cards = new CardData[numMax];
 
     // 最初のカードの配置位置
     Vector2 firstPos;
@@ -450,4 +450,49 @@ public class CardManagement : MonoBehaviour {
     {
         return countDownFlag;
     }
+
+    //  カードの情報関係 /////////////////////////////////////////////////////////////////////////////////
+
+    // ボード情報を初期状態に戻す
+    public void ReturnBoard(ResetScript.INITDATA data)
+    {
+        // ActionBoardの情報を取得
+        CardBord bord = actionBord.GetComponent<CardBord>();
+
+        // カードの削除
+        for (int i = 0; i < bord.cards.Length; i++)
+        {
+            if (bord.cards[i].obj != null)
+                Destroy(bord.cards[i].obj);
+        }
+
+        // カードの再配置
+        bord.numSet = 0;
+        for (int i = 0; i < data.setCard.Length; i++)
+        {
+            switch (data.setCard[i].type)
+            {
+                case CardType.Move:
+                    bord.SetCard(Instantiate(moveCard), data.setCard[i].type);
+                    break;
+                case CardType.Jump:
+                    bord.SetCard(Instantiate(jumpCard), data.setCard[i].type);
+                    break;
+                case CardType.Attack:
+                    bord.SetCard(Instantiate(attackCard), data.setCard[i].type);
+                    break;
+                case CardType.Finish:
+                    bord.SetCard(Instantiate(finishCard), data.setCard[i].type);
+                    break;
+                default:
+                    break;
+            }
+        }
+        bord.Coordinate();
+
+        //// カード所持数を戻す
+        //for (int i = 0; i < cards.Length; i++)
+        //    cards[i].numHold = data.cardNum[i];
+    }
+
 }
