@@ -105,14 +105,14 @@ public class CardManagement : MonoBehaviour {
         isUpdateData = true;
         isControlCard = true;
 
-        // boardサイズの設定
-        handsBord.transform.localScale = new Vector3(10, 1.5f, 1);
-        actionBord.transform.localScale = new Vector3(10, 1.5f, 1);
+        //// boardサイズの設定
+        //handsBord.transform.localScale = new Vector3(10, 1.5f, 1);
+        //actionBord.transform.localScale = new Vector3(10, 1.5f, 1);
 
         // サイズの取得(m)
-        handsBordSize = new Vector2(handsBord.transform.lossyScale.x, handsBord.transform.lossyScale.y);
-        actionBordSize = new Vector2(actionBord.transform.lossyScale.x, actionBord.transform.lossyScale.y);
-        cardSize = new Vector2(attackCard.transform.localScale.x, attackCard.transform.localScale.y);
+        handsBordSize = handsBord.GetComponent<RectTransform>().sizeDelta;
+        actionBordSize = actionBord.GetComponent<RectTransform>().sizeDelta;
+        cardSize = attackCard.GetComponent<RectTransform>().sizeDelta;
 
         firstPos = new Vector2(cardSize.x / 2 + cardSpace - handsBordSize.x / 2, 0.0f);
 

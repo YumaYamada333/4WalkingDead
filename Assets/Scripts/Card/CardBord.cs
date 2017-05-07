@@ -56,7 +56,7 @@ public class CardBord : MonoBehaviour {
     // Use this for initialization
     void Start ()
     {
-        cardSize = new Vector2(0.8f, 1.0f);
+        //cardSize = cards[0].obj.GetComponent<RectTransform>().sizeDelta;
         centerCard = 0;
         selectedSpace = 0;
         //numSet = 0;
@@ -97,6 +97,8 @@ public class CardBord : MonoBehaviour {
     // Update is called once per frame
     void Update ()
     {
+        cardSize = cards[0].obj.GetComponent<RectTransform>().sizeDelta;
+
         //アクションモードになったら
         if (state.GetGameState() == GameManager.GameState.Acttion)
         {
