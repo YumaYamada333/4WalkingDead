@@ -488,7 +488,7 @@ public class CardManagement : MonoBehaviour {
 
         // カードの再配置
         bord.numSet = 0;
-        for (int i = 0; i < data.setCard.Length; i++)
+        for (int i = 0; i < bord.cards.Length; i++)
         {
             switch (data.setCard[i].type)
             {

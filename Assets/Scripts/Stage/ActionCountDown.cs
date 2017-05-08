@@ -139,7 +139,7 @@ public class ActionCountDown : MonoBehaviour {
     void GetCountZero()
     {
         //カウントが0になり、いままで一度もフラグが立っていなかったらフラグをあげる
-        if (obj.GetComponent<CountDown>().GetCount() == 0 &&
+        if (obj.transform.FindChild("CountUI").GetComponent<CountDown>().GetCount() == 0 &&
             m_old_flag == false)
         {
             m_action_flag = true;
