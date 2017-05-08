@@ -400,7 +400,21 @@ public class PlayerAction : MonoBehaviour
             GameObject.Find("GameManager").GetComponent<ToResultScene>().ToOver(2, ToResultScene.OverType.FALL);
         }
 
+        //トゲ
+        if (coll.gameObject.tag == "Thorn")
+        {
+            // 五秒後にゲームオーバー
+            GameObject.Find("GameManager").GetComponent<ToResultScene>().ToOver(2);
+        }
+
+        //落下限界
+        if (coll.gameObject.tag == "GameOverZone")
+        {
+            // 五秒後にゲームオーバー
+            GameObject.Find("GameManager").GetComponent<ToResultScene>().ToOver(0);
+        }
     }
+
     //----------------------------------------------------------------------
     //! @brief ステージオブジェクトとの当たり判定
     //!
@@ -414,14 +428,14 @@ public class PlayerAction : MonoBehaviour
         if (hit.gameObject.tag == "Goal")
         {
             // 五秒後にクリア
-            GameObject.Find("GameManager").GetComponent<ToResultScene>().ToClear(5);
+            GameObject.Find("GameManager").GetComponent<ToResultScene>().ToClear(3);
         }
-        //トゲ
-        if (hit.gameObject.tag == "Thorn")
-        {
-            // 五秒後にゲームオーバー
-            GameObject.Find("GameManager").GetComponent<ToResultScene>().ToOver(5);
-        }
+        ////トゲ
+        //if (hit.gameObject.tag == "Thorn")
+        //{
+        //    // 五秒後にゲームオーバー
+        //    GameObject.Find("GameManager").GetComponent<ToResultScene>().ToOver(2);
+        //}
         //地面
         if (!isGround)
         {
