@@ -13,7 +13,7 @@ class BlockAction
 }
 
 //動くアクションのクラス
-class BlockMove : BlockAction 
+class BlockMove : BlockAction
 {
     //スタートの時間
     private float m_start_time = 0.0f;
@@ -45,7 +45,7 @@ class BlockMove : BlockAction
         //フラグがたっていたら移動(補間)
         if (obj.GetComponent<ActionCountDown>().GetActionFlag())
         {
-           obj.transform.position = (1 - timeStep) * m_start_pos + timeStep * (m_start_pos + obj.GetComponent<ActionCountDown>().m_move_distance);
+            obj.transform.position = (1 - timeStep) * m_start_pos + timeStep * (m_start_pos + obj.GetComponent<ActionCountDown>().m_move_distance);
         }
     }
 }
@@ -69,7 +69,8 @@ class BlockBreak : BlockAction
 }
 
 //実行クラス
-public class ActionCountDown : MonoBehaviour {
+public class ActionCountDown : MonoBehaviour
+{
 
     //アクションの種類用定数
     const int ACT_MOVE = 0;
@@ -93,11 +94,13 @@ public class ActionCountDown : MonoBehaviour {
 
     //アクション
     private BlockAction action = null;
-
+    //GameObjectでColliderと触れているの要素数
+    private List<GameObject> ride = new List<GameObject>();
     // Use this for initialization
-    void Start () {
+    void Start()
+    {
         //指定したアクションタイプによってアクションを変更
-       switch(m_action_type)
+        switch (m_action_type)
         {
             case ACT_MOVE:
                 action = new BlockMove();
@@ -112,9 +115,10 @@ public class ActionCountDown : MonoBehaviour {
         //自身を取得
         obj = this.gameObject;
     }
-	
-	// Update is called once per frame
-	void Update () {
+
+    // Update is called once per frame
+    void Update()
+    {
         //カウントダウン
         GetCountZero();
 
@@ -122,19 +126,23 @@ public class ActionCountDown : MonoBehaviour {
         if (action != null)
         {
             //フラグが立ったらアクションの準備
-            if (m_action_flag == true && 
+            if (m_action_flag == true &&
                 m_action_flag != m_old_flag)
             {
                 action.Preparation(ref obj);
                 m_old_flag = m_action_flag;
             }
-
             //アクションの実行
             action.Execute(ref obj);
-
+            //GameObjectの移動
+            foreach (GameObject otherObj in ride)
+            {
+                //動く床の位置にObjectの座標を合わせる
+                Vector3 v = otherObj.transform.position;
+                otherObj.transform.position = new Vector3(obj.transform.position.x, v.y, v.z);
+            }
         }
     }
-
     //カウントダウンによってフラグをあげる
     void GetCountZero()
     {
@@ -144,7 +152,7 @@ public class ActionCountDown : MonoBehaviour {
         {
             m_action_flag = true;
         }
-      
+
     }
 
     //アクションフラグを返す
@@ -163,5 +171,16 @@ public class ActionCountDown : MonoBehaviour {
     public void DestroyObject()
     {
         Destroy(this.gameObject);
+    }
+    //他のObjectが接触している時
+    void OnTriggerEnter(Collider otherObj)
+    {
+        ride.Add(otherObj.gameObject);
+    }
+    //他のObjectが離れている時
+    void OnTriggerExit(Collider otherObj)
+    {
+        //床から離れたので削除
+        ride.Remove(otherObj.gameObject);
     }
 }
