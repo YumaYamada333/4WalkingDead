@@ -106,7 +106,6 @@ public class Button : MonoBehaviour {
             // boardの配置
             HandsBord.transform.localPosition = setPosHandsBord;
             ActionBord.transform.localPosition = setPosActionBord;
-
             // HandsBordを表示
             HandsBord.SetActive(true);
         }

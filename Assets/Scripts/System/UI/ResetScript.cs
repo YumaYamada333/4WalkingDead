@@ -42,8 +42,13 @@ public class ResetScript : MonoBehaviour
                 earlyCard[i].setCard[j].type = CardManagement.CardType.Nothing;
             }
         }
-
-        SaveCard(bord.cards, cards.cards);
+    }
+    private void Update()
+    {
+        if (earlyCard[0].setCard[0].obj == null)
+        {
+            SaveCard(bord.cards, cards.cards);
+        }
     }
 
     //ボタンクリック時の処理

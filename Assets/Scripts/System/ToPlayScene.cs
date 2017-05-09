@@ -20,7 +20,7 @@ public class ToPlayScene : MonoBehaviour {
             AudioSource audioSource = gameObject.GetComponent<AudioSource>();
             audioSource.PlayOneShot(OK);
 
-            Application.LoadLevel("Play");
+            Application.LoadLevel("newStage1");
         }
     }
 }
