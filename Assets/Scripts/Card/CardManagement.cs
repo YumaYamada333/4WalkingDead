@@ -388,7 +388,8 @@ public class CardManagement : MonoBehaviour {
                     card.obj = Instantiate(finishCard);
                     break;
             }
-            card.obj.transform.parent = handsBord.transform; 
+            card.obj.transform.parent = handsBord.transform;
+            card.obj.transform.localScale = new Vector3(1.0f, 1.0f, 1.0f);
         }
     }
 
@@ -404,7 +405,7 @@ public class CardManagement : MonoBehaviour {
         const float zPos = -0.1f;
         // numSetting番目の位置に配置
         card.front.obj.transform.localPosition 
-            = new Vector3(firstPos.x + numSetting * posInterval, firstPos.y, zPos) / handsBord.transform.localScale.x;
+            = new Vector3(firstPos.x + numSetting * posInterval, firstPos.y, zPos);
         if (numSetting == selectedCard && cursor == CursorForcusTag.HandsBord)
             card.front.obj.transform.localPosition += new Vector3(0, 0, -0.1f);
         card.back.obj.transform.position = card.front.obj.transform.position + new Vector3(0.2f, 0.01f, 0.0f);

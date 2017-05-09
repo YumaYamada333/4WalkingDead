@@ -89,7 +89,8 @@ public class CardBord : MonoBehaviour {
             //}
             //else
             //{
-            cards[i].obj.transform.localPosition = new Vector3((i - centerCard) * cardSize.x - 4.0f, 0.0f, zPos) / transform.localScale.x;
+            cards[i].obj.transform.localPosition = 
+                new Vector3(cardSize.x / 2 + (i - centerCard) * cardSize.x - GetComponent<RectTransform>().sizeDelta.x / 2, 0.0f, zPos);
             //}
         }
     }
@@ -228,6 +229,7 @@ public class CardBord : MonoBehaviour {
     {
         cards[numSet].obj = obj;
         cards[numSet].obj.transform.parent = transform;
+        cards[numSet].obj.transform.localScale = new Vector3(1.0f, 1.0f, 1.0f);
         cards[numSet].type = type;
         numSet++;
         return true;
@@ -270,7 +272,8 @@ public class CardBord : MonoBehaviour {
         
         cards[posNo].obj = Instantiate(card.obj);
         cards[posNo].obj.transform.parent = transform;
-        cards[posNo].obj.transform.localScale = card.obj.transform.localScale;
+        cards[posNo].obj.transform.localScale = new Vector3(1.0f, 1.0f, 1.0f);
+        //cards[posNo].obj.transform.localScale = card.obj.transform.localScale;
         cards[posNo].type = card.type;
         numSet++;
         return true;

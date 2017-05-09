@@ -7,6 +7,8 @@ public class MouseSystem : MonoBehaviour {
     Vector3 screen_pos;    //マウスのスクリーン座標
     Vector3 world_pos;     //マウスのワールド座標
 
+    GameObject[] checkList;  // マウスとの判定を行うもののリスト
+
     // Use this for initialization
     void Start ()
     {
@@ -56,4 +58,10 @@ public class MouseSystem : MonoBehaviour {
     {
         return world_pos;
     }
+
+    public void AddList(ref GameObject obj)
+    {
+        
+    }
+
 }
