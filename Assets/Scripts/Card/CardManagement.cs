@@ -235,30 +235,13 @@ public class CardManagement : MonoBehaviour {
             // 左クリックした座標にあるカードをつかむ
             if (Input.GetMouseButton(0))
             {
-                // Rayに触れたオブジェクトをすべて取得
-                hit = mouse_system.GetReyhitObjects();
-
-                if (hit.Length > 0)
+                // マウスの座標上にあるカードを取得
+                selectedCard = mouse_system.GetMouseHit(handsBord);
+                if (selectedCard >= 0)
                 {
-                    if (hit[hit.Length - 1].collider.tag == "Card")
-                    {
-                        for (int i = 0; i < cards.Length; i++)
-                        {
-                            if (cards[i].front.obj != null)
-                            {
-                                // Rayに触れているオブジェクトとボードのカードの座標が同じ
-                                if (hit[hit.Length - 1].transform.position == cards[i].front.obj.transform.position)
-                                {
-                                    // はさむカードに設定
-                                    selectedCard = i;
-                                    tuckCard = cards[selectedCard];
-                                    break;
-                                }
-                            }
-                        }
-                        cursor = CursorForcusTag.ActtionBord;
-                        actionBord.GetComponent<CardBord>().selectedSpace = -1;
-                    }
+                    tuckCard = cards[selectedCard];
+                    cursor = CursorForcusTag.ActtionBord;
+                    actionBord.GetComponent<CardBord>().selectedSpace = -1;
                 }
             }
         }
@@ -272,78 +255,48 @@ public class CardManagement : MonoBehaviour {
             if (Input.GetMouseButton(0))
             {
                 // カードを移動
-                for (int i = 0; i < hit.Length; i++)
-                {
-                    if (hit[i].collider.tag == "Card")
-                    {
-                        GameObject parent_obj = hit[i].transform.parent.gameObject;
-                        parent_obj.transform.position = mouse_system.GetWorldPos();
-                    }
-                }
+                tuckCard.front.obj.transform.position = mouse_system.GetScreenPos();
             }
             // してない
             else
             {
                 cursor = CursorForcusTag.HandsBord;
 
-                // カメラからはさむカードの傾きを取得
-                Vector3 pos = hit[hit.Length - 1].transform.position - GameObject.FindGameObjectWithTag("MainCamera").transform.position;
-
-                // Rey座標を設定
-                Ray ray = new Ray(hit[hit.Length - 1].transform.position, pos);
-                RaycastHit select_card;
-
-                // Rayに触れたカードをはさむ
-                if (Physics.Raycast(ray, out select_card))
+                bord.selectedSpace = mouse_system.GetMouseHit(actionBord);
+                if (bord.selectedSpace >= 0)
                 {
-                    if (select_card.collider.tag == "Card")
+                    countDownFlag = true;
+
+                    // 挟んだカードが同タイプ
+                    if (bord.GetCardType(bord.selectedSpace) == tuckCard.front.type
+                        && bord.GetCardType(bord.selectedSpace) == tuckCard.back.type)
                     {
-                        for (int i = 0; i < bord.cards.Length; i++)
+                        // カードの効果を変える
+                        // CardBord.CardData newCard;
+                        //newCard.type = DecideTuckCard(tuckCard.front.type, tuckCard.back.type);
+                        //newCard.obj = null;
+                        //CreateCards(ref newCard);
+                        //if (newCard.obj != null)
                         {
-                            if (!bord.cards[i].obj) continue;
-                            //挟みたいカードとボードのカード座標が同じ
-                            if (bord.cards[i].obj.transform.position == select_card.transform.position)
-                            {
-                                bord.selectedSpace = i;
-                                countDownFlag = true;
-
-                                // 挟んだカードが同タイプ
-                                if (bord.GetCardType(bord.selectedSpace) == tuckCard.front.type
-                                    && bord.GetCardType(bord.selectedSpace) == tuckCard.back.type)
-                                {
-                                    // カードの効果を変える
-                                   // CardBord.CardData newCard;
-                                    //newCard.type = DecideTuckCard(tuckCard.front.type, tuckCard.back.type);
-                                    //newCard.obj = null;
-                                    //CreateCards(ref newCard);
-                                    //if (newCard.obj != null)
-                                    {
-                                        //// 挟まれたカードの削除
-                                        //bord.DeleteCard(bord.selectedSpace);
-                                        //// 上記の位置に新しいカード
-                                        //bord.TuckCard(newCard, bord.selectedSpace);
-                                    }
-                                    //else
-                                    {
-                                        bord.TuckCard(tuckCard.front, bord.selectedSpace);
-                                        bord.TuckCard(tuckCard.back, bord.selectedSpace + 2);
-                                    }
-                                    //Destroy(newCard.obj);
-
-                                }
-                                else
-                                {
-                                    bord.TuckCard(tuckCard.front, bord.selectedSpace);
-                                    bord.TuckCard(tuckCard.back, bord.selectedSpace + 2);
-                                }
-
-                                // セットしたカード枚数を減らす
-                                cards[selectedCard].numHold--;
-
-                                break;
-                            }
+                            //// 挟まれたカードの削除
+                            //bord.DeleteCard(bord.selectedSpace);
+                            //// 上記の位置に新しいカード
+                            //bord.TuckCard(newCard, bord.selectedSpace);
                         }
+                        //else
+                        {
+                            bord.TuckCard(tuckCard.front, bord.selectedSpace);
+                            bord.TuckCard(tuckCard.back, bord.selectedSpace + 2);
+                        }
+                        //Destroy(newCard.obj);
                     }
+                    else
+                    {
+                        bord.TuckCard(tuckCard.front, bord.selectedSpace);
+                        bord.TuckCard(tuckCard.back, bord.selectedSpace + 2);
+                    }
+                    // セットしたカード枚数を減らす
+                    cards[selectedCard].numHold--;
                 }
             }
 
@@ -356,7 +309,6 @@ public class CardManagement : MonoBehaviour {
                 bord.selectedSpace = bord.numSet - 1;
             }
         }
-
     }
 
     // 存在しないカードの生成
