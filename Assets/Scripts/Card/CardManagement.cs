@@ -256,6 +256,7 @@ public class CardManagement : MonoBehaviour {
             {
                 // カードを移動
                 tuckCard.front.obj.transform.position = mouse_system.GetScreenPos();
+                tuckCard.back.obj.transform.position = mouse_system.GetScreenPos();
             }
             // してない
             else
