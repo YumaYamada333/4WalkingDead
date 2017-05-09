@@ -297,6 +297,7 @@ public class CardManagement : MonoBehaviour {
                     }
                     // セットしたカード枚数を減らす
                     cards[selectedCard].numHold--;
+                    bord.Coordinate();
                 }
             }
 
