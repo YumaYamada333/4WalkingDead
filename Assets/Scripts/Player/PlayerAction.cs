@@ -422,8 +422,8 @@ public class PlayerAction : MonoBehaviour
             // すぐにゲームオーバー
             GameObject.Find("GameManager").GetComponent<ToResultScene>().ToOver(0);
         }
-        //cube
-        if(coll.gameObject.tag == "Untagged")
+        //Block
+        if(coll.gameObject.tag == "Block")
         {
             // ２秒後にゲームオーバー
             GameObject.Find("GameManager").GetComponent<ToResultScene>().ToOver(Constants.OverTime);
