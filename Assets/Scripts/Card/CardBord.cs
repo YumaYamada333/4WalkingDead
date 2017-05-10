@@ -29,6 +29,9 @@ public class CardBord : MonoBehaviour {
     // 中心のカード
     int centerCard;
 
+    // スクロールの状態
+    float scrollStep;
+
     // 使用中カード
     public int usingCard;
 
@@ -63,6 +66,8 @@ public class CardBord : MonoBehaviour {
         usingCard = 0;
         exceedFlag = false;
 
+        scrollStep = 0.0f;
+
         // MouseSystemコンポーネントの取得
         mouse_system = GameObject.Find("MouseSystem").GetComponent<MouseSystem>();
         state = GameObject.Find("GameManager").GetComponent<GameManager>();
@@ -89,8 +94,9 @@ public class CardBord : MonoBehaviour {
             //}
             //else
             //{
-            cards[i].obj.transform.localPosition = 
-                new Vector3(cardSize.x / 2 + (i - centerCard) * cardSize.x - GetComponent<RectTransform>().sizeDelta.x / 2, 0.0f, zPos);
+            cards[i].obj.transform.localPosition =
+                //new Vector3(cardSize.x / 2 + (i - centerCard) * cardSize.x - GetComponent<RectTransform>().sizeDelta.x / 2, 0.0f, zPos);
+                new Vector3(cardSize.x / 2 + (i - centerCard) * cardSize.x - GetComponent<RectTransform>().sizeDelta.x / 2 + scrollStep, 0.0f, zPos);
             //}
         }
     }
@@ -307,8 +313,9 @@ public class CardBord : MonoBehaviour {
 
             //左スクロール
             cards[j].obj.transform.localPosition += new Vector3(cardSize.x, 0, 0);
-
+            
         }
+        scrollStep += cardSize.x;
     }
     public void ScroolToLeft()
     {
@@ -321,6 +328,7 @@ public class CardBord : MonoBehaviour {
             cards[j].obj.transform.localPosition -= new Vector3(cardSize.x, 0, 0);
            
         }
+        scrollStep -= cardSize.x;
     }
 
     // 使用中カードの取得
