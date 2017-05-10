@@ -14,17 +14,20 @@ using UnityEngine;
 //定数の定義
 static class Constants
 {
-    public const int Attack = 1;        //attak
-    public const int StageHeight = 2;  //ステージの高さ
-    public const int RunPow = 2;       //走る距離
-    public const int SuperAttack = 3;  //superattack
-    public const int MaxEnemy = 4;     //敵の数
-    public const int MaxJumpPow = 5;   //最大のジャンプ力
-    public const int MaxAnimation = 6; //最大のアニメーションの数
-    public const int MaxTime = 10;     //最大時間
-    public const int MoveCount = 60;   //移動エフェクトのループ再生する間隔
+    public const int Attack 　　  = 1;  //attak
+    public const int StageHeight  = 2;  //ステージの高さ
+    public const int RunPow       = 2;  //走る距離
+    public const int OverTime     = 2;  //ゲームオーバーまでの時間
+    public const int ClearTime    = 3;  //ゲームクリアまでの時間
+    public const int SuperAttack  = 3;  //superattack
+    public const int MaxEnemy     = 4;  //敵の数
+    public const int MaxJumpPow   = 5;  //最大のジャンプ力
+    public const int MaxAnimation = 6;  //最大のアニメーションの数
+    public const int MaxTime      = 10; //最大時間
+    public const int MoveCount    = 60; //移動エフェクトのループ再生する間隔
 
-    public const float Adjustment = 0.5f;   //調整
+    public const float Adjustment   = 0.5f; //調整
+    public const float DownPos      = 1.0f; //ポジションを落とす
     public const float MassDistance = 2.2f; //マスの距離
 }
 //アニメーション
@@ -103,7 +106,7 @@ public class PlayerAction : MonoBehaviour
             if (isGround)       //地面についている
                 middlePosition.y = transform.position.y;    //中央地点yを今のプレイヤーの座標にする
             if (!isGround)      //地面についていない
-                middlePosition.y -= 1.0f;                   //中央地点yを引く
+                middlePosition.y -= Constants.DownPos;                   //中央地点yを引く
         }
         //中央地点yがステージの高さより低い場合
         if (middlePosition.y < Constants.StageHeight)
@@ -377,8 +380,8 @@ public class PlayerAction : MonoBehaviour
                     cardSetFlag = true;                     //カードセットフラグ
                     animationNum = (int)ANIMATION.ATTACK;   //アニメーションの番号
                     animationName = "Over";                 //アニメーションの名前
-                    // 五秒後にゲームオーバー
-                    GameObject.Find("GameManager").GetComponent<ToResultScene>().ToOver(2);
+                    // ２秒後にゲームオーバー
+                    GameObject.Find("GameManager").GetComponent<ToResultScene>().ToOver(Constants.OverTime);
 
                     break;
             }
@@ -399,25 +402,36 @@ public class PlayerAction : MonoBehaviour
         {
             //エフェクト再生
             EffekseerHandle p_damage = EffekseerSystem.PlayEffect("PlayerDamage", transform.position);
-            // 五秒後にゲームオーバー
-            GameObject.Find("GameManager").GetComponent<ToResultScene>().ToOver(2, ToResultScene.OverType.FALL);
+            // ２秒後にゲームオーバー
+            GameObject.Find("GameManager").GetComponent<ToResultScene>().ToOver(Constants.OverTime);
         }
 
         //トゲ
         if (coll.gameObject.tag == "Thorn")
         {
-            // 五秒後にゲームオーバー
-            GameObject.Find("GameManager").GetComponent<ToResultScene>().ToOver(2);
+            // ２秒後にゲームオーバー
+            GameObject.Find("GameManager").GetComponent<ToResultScene>().ToOver(Constants.OverTime);
         }
 
         //落下限界
         if (coll.gameObject.tag == "GameOverZone")
         {
-            // 五秒後にゲームオーバー
+            // すぐにゲームオーバー
             GameObject.Find("GameManager").GetComponent<ToResultScene>().ToOver(0);
+        }
+        //cube
+        if(coll.gameObject.tag == "Untagged")
+        {
+            // ２秒後にゲームオーバー
+            GameObject.Find("GameManager").GetComponent<ToResultScene>().ToOver(Constants.OverTime);
+
         }
     }
 
+    void ToResult(System.String tagName)
+    {
+
+    }
     //----------------------------------------------------------------------
     //! @brief ステージオブジェクトとの当たり判定
     //!
@@ -430,15 +444,9 @@ public class PlayerAction : MonoBehaviour
         //ゴール
         if (hit.gameObject.tag == "Goal")
         {
-            // 五秒後にクリア
+            // ３秒後にクリア
             GameObject.Find("GameManager").GetComponent<ToResultScene>().ToClear(3);
         }
-        ////トゲ
-        //if (hit.gameObject.tag == "Thorn")
-        //{
-        //    // 五秒後にゲームオーバー
-        //    GameObject.Find("GameManager").GetComponent<ToResultScene>().ToOver(2);
-        //}
         //地面
         if (!isGround)
         {
