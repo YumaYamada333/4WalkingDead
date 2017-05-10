@@ -64,7 +64,7 @@ public class MouseSystem : MonoBehaviour {
 
     public int GetMouseHit(GameObject board)
     {
-        if (Collider(board))
+        //if (Collider(board))
         {
             if (board.name == "HandsBord")
             {
