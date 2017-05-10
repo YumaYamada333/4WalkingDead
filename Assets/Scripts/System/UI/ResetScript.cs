@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class ResetScript : MonoBehaviour
 {
@@ -20,6 +21,9 @@ public class ResetScript : MonoBehaviour
     CardBord bord;
     CardManagement cards;
 
+    //カウントアクションをするオブジェクトのコンポーネント取得用
+    ActionCountDown ActCountDown;
+
     private void Start()
     {
         //ボタンを非表示にしておく
@@ -28,6 +32,8 @@ public class ResetScript : MonoBehaviour
         //コンポーネントの取得
         bord = GameObject.Find("ActionBord").GetComponent<CardBord>();
         cards = GameObject.Find("CardManager").GetComponent<CardManagement>();
+
+        ActCountDown = GetComponent<ActionCountDown>();
 
         //データを保存する領域
         earlyCard = new INITDATA[detaNum];
@@ -49,6 +55,10 @@ public class ResetScript : MonoBehaviour
         {
             SaveCard(bord.cards, cards.cards);
         }
+
+        ////カウントアクションをするオブジェクトを保存
+        //SaveObj(ref ActCountDown.obj, ActCountDown.m_action_type);
+
     }
 
     //ボタンクリック時の処理
@@ -56,7 +66,13 @@ public class ResetScript : MonoBehaviour
     {
         num = 0;
 
+        //初期カードを再生成
         cards.ReturnBoard(earlyCard[num]);
+
+        //現在読み込んでいるシーンの名前を取得
+        string currentScene = SceneManager.GetActiveScene().name;
+        //取得したシーン名で再読み込み
+        SceneManager.LoadScene(currentScene);
     }
 
     // 現在のボード情報を保存
@@ -85,4 +101,31 @@ public class ResetScript : MonoBehaviour
             num++;
         //}
     }
+
+    //現在のオブジェクトの状態を保存
+    //private void SaveObj(ref GameObject obj,int ActType)
+    //{
+    //    //アクションタイプ
+    //    const int Move = 0;
+    //    const int Break = 1;
+
+    //    //オブジェクトの座標
+    //    Vector2 ObjTmp;
+    //    //オブジェクトの情報
+    //    GameObject InitObj;
+
+    //    //アクションタイプの判別
+    //    switch(ActType)
+    //    {
+    //        //座標を保存
+    //        case Move:
+    //            ObjTmp = new Vector2(obj.transform.position.x, obj.transform.position.y);            
+    //            break;
+    //        //オブジェクト情報を保存
+    //        case Break:
+    //            InitObj = obj;
+    //            break;
+    //    }
+    //}
+
 }
