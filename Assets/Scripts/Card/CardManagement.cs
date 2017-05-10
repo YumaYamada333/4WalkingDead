@@ -412,6 +412,12 @@ public class CardManagement : MonoBehaviour {
                 bord.usingCard++;
             else
                 type = CardType.Nothing;
+
+            //if (type == CardType.Move)
+            //{
+            //    //countDownFlag = true;
+            //}
+
             return type;
         }
         else
@@ -425,6 +431,12 @@ public class CardManagement : MonoBehaviour {
     public bool GetCountDownFlag()
     {
         return countDownFlag;
+    }
+
+    // カウントダウンフラグの状態を設定
+    public void SetCountDownFlag(bool flag)
+    {
+        countDownFlag = flag;
     }
 
     //  カードの情報関係 /////////////////////////////////////////////////////////////////////////////////
