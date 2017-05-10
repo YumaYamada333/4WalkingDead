@@ -7,6 +7,8 @@ public class CountDown : MonoBehaviour {
 
     // カウント
     private int count;
+    //初期カウント数
+    private int init_count;
 
     // カウントコンポーネント
     private Text T_count;
@@ -19,6 +21,7 @@ public class CountDown : MonoBehaviour {
 
         // カウント数を取得
         count = int.Parse(T_count.text);
+        init_count = count;
     }
 
     // Update is called once per frame
@@ -38,5 +41,14 @@ public class CountDown : MonoBehaviour {
     public int GetCount()
     {
         return count;
+    }
+
+    // カウントの設定(無入力or0を入力すると初期値に変更)
+    public void SetCount(int num = 0)
+    {
+        if (num != 0)
+        { count = num; }
+        else
+        { count = init_count; }
     }
 }

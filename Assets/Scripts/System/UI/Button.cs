@@ -28,6 +28,14 @@ public class Button : MonoBehaviour {
     // handsboradの初期位置
     private Vector3 firstPos = Vector3.zero;
 
+    // セット時　アクション時のカードboard位置
+    [SerializeField]
+    private Vector3 setPosActionBord = Vector3.zero;
+    [SerializeField]
+    private Vector3 setPosHandsBord = Vector3.zero;
+    [SerializeField]
+    private Vector3 actPosActionBord = Vector3.zero;
+
     // Use this for initialization
     void Awake ()
     {
@@ -56,7 +64,7 @@ public class Button : MonoBehaviour {
         //}
 
         // actionboardの配置
-        ActionBord.transform.localPosition = new Vector3(0.05f, 0.05f, -10.0f);
+        ActionBord.transform.localPosition = actPosActionBord;
 
         // 初期位置取得
         firstPos = mainCamera.transform.position;
@@ -70,7 +78,7 @@ public class Button : MonoBehaviour {
         // actionboardの位置更新
         if (mainCamera.activeSelf)
         {
-            ActionBord.transform.position = new Vector3(0.05f, 0.05f, -10.0f) + mainCamera.transform.position - firstPos;
+            ActionBord.transform.localPosition = actPosActionBord/* + mainCamera.transform.position - firstPos*/;
         }
 
     }
@@ -96,11 +104,8 @@ public class Button : MonoBehaviour {
             //ResetButton.SetActive(true);
 
             // boardの配置
-            HandsBord.transform.position = new Vector3(1.0f, 1.0f, -10.0f);
-            ActionBord.transform.position = new Vector3(1.0f, 4.0f, -10.0f);
-            //ActionBord.transform.localPosition = new Vector3(11.0f, 2.0f, 1.2f);
-            //ActionBord.transform.localPosition += new Vector3(9.0f, 4.5f, 0.2f);
-
+            HandsBord.transform.localPosition = setPosHandsBord;
+            ActionBord.transform.localPosition = setPosActionBord;
             // HandsBordを表示
             HandsBord.SetActive(true);
         }
@@ -118,9 +123,8 @@ public class Button : MonoBehaviour {
             //RetuneButton.SetActive(false);
             //ResetButton.SetActive(false);
 
-            // actionbordの配置
-            ActionBord.transform.position = new Vector3(0.05f, 0.05f, -10.0f) + mainCamera.transform.position - firstPos;
-            //ActionBord.transform.localPosition -= new Vector3(9.0f, 4.5f, 0.2f);
+            //actionbordの配置
+            ActionBord.transform.localPosition = actPosActionBord;
 
             // HandsBordを非表示
             HandsBord.SetActive(false);

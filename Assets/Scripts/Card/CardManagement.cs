@@ -105,14 +105,14 @@ public class CardManagement : MonoBehaviour {
         isUpdateData = true;
         isControlCard = true;
 
-        // boardサイズの設定
-        handsBord.transform.localScale = new Vector3(10, 1.5f, 1);
-        actionBord.transform.localScale = new Vector3(10, 1.5f, 1);
+        //// boardサイズの設定
+        //handsBord.transform.localScale = new Vector3(10, 1.5f, 1);
+        //actionBord.transform.localScale = new Vector3(10, 1.5f, 1);
 
         // サイズの取得(m)
-        handsBordSize = new Vector2(handsBord.transform.lossyScale.x, handsBord.transform.lossyScale.y);
-        actionBordSize = new Vector2(actionBord.transform.lossyScale.x, actionBord.transform.lossyScale.y);
-        cardSize = new Vector2(attackCard.transform.localScale.x, attackCard.transform.localScale.y);
+        handsBordSize = handsBord.GetComponent<RectTransform>().sizeDelta;
+        actionBordSize = actionBord.GetComponent<RectTransform>().sizeDelta;
+        cardSize = attackCard.GetComponent<RectTransform>().sizeDelta;
 
         firstPos = new Vector2(cardSize.x / 2 + cardSpace - handsBordSize.x / 2, 0.0f);
 
@@ -148,6 +148,7 @@ public class CardManagement : MonoBehaviour {
 
         // ステージの仮のmoveカード配置
         CardBord bord = actionBord.GetComponent<CardBord>();
+        bord.SetCard(Instantiate(moveCard), CardType.Move);
         bord.SetCard(Instantiate(moveCard), CardType.Move);
         bord.SetCard(Instantiate(moveCard), CardType.Move);
         bord.SetCard(Instantiate(moveCard), CardType.Move);
@@ -234,30 +235,13 @@ public class CardManagement : MonoBehaviour {
             // 左クリックした座標にあるカードをつかむ
             if (Input.GetMouseButton(0))
             {
-                // Rayに触れたオブジェクトをすべて取得
-                hit = mouse_system.GetReyhitObjects();
-
-                if (hit.Length > 0)
+                // マウスの座標上にあるカードを取得
+                selectedCard = mouse_system.GetMouseHit(handsBord);
+                if (selectedCard >= 0)
                 {
-                    if (hit[hit.Length - 1].collider.tag == "Card")
-                    {
-                        for (int i = 0; i < cards.Length; i++)
-                        {
-                            if (cards[i].front.obj != null)
-                            {
-                                // Rayに触れているオブジェクトとボードのカードの座標が同じ
-                                if (hit[hit.Length - 1].transform.position == cards[i].front.obj.transform.position)
-                                {
-                                    // はさむカードに設定
-                                    selectedCard = i;
-                                    tuckCard = cards[selectedCard];
-                                    break;
-                                }
-                            }
-                        }
-                        cursor = CursorForcusTag.ActtionBord;
-                        actionBord.GetComponent<CardBord>().selectedSpace = -1;
-                    }
+                    tuckCard = cards[selectedCard];
+                    cursor = CursorForcusTag.ActtionBord;
+                    actionBord.GetComponent<CardBord>().selectedSpace = -1;
                 }
             }
         }
@@ -271,78 +255,50 @@ public class CardManagement : MonoBehaviour {
             if (Input.GetMouseButton(0))
             {
                 // カードを移動
-                for (int i = 0; i < hit.Length; i++)
-                {
-                    if (hit[i].collider.tag == "Card")
-                    {
-                        GameObject parent_obj = hit[i].transform.parent.gameObject;
-                        parent_obj.transform.position = mouse_system.GetWorldPos();
-                    }
-                }
+                tuckCard.front.obj.transform.position = mouse_system.GetScreenPos();
+                tuckCard.back.obj.transform.position = mouse_system.GetScreenPos();
             }
             // してない
             else
             {
                 cursor = CursorForcusTag.HandsBord;
 
-                // カメラからはさむカードの傾きを取得
-                Vector3 pos = hit[hit.Length - 1].transform.position - GameObject.FindGameObjectWithTag("MainCamera").transform.position;
-
-                // Rey座標を設定
-                Ray ray = new Ray(hit[hit.Length - 1].transform.position, pos);
-                RaycastHit select_card;
-
-                // Rayに触れたカードをはさむ
-                if (Physics.Raycast(ray, out select_card))
+                bord.selectedSpace = mouse_system.GetMouseHit(actionBord);
+                if (bord.selectedSpace >= 0)
                 {
-                    if (select_card.collider.tag == "Card")
+                    countDownFlag = true;
+
+                    // 挟んだカードが同タイプ
+                    if (bord.GetCardType(bord.selectedSpace) == tuckCard.front.type
+                        && bord.GetCardType(bord.selectedSpace) == tuckCard.back.type)
                     {
-                        for (int i = 0; i < bord.cards.Length; i++)
+                        // カードの効果を変える
+                        // CardBord.CardData newCard;
+                        //newCard.type = DecideTuckCard(tuckCard.front.type, tuckCard.back.type);
+                        //newCard.obj = null;
+                        //CreateCards(ref newCard);
+                        //if (newCard.obj != null)
                         {
-                            if (!bord.cards[i].obj) continue;
-                            //挟みたいカードとボードのカード座標が同じ
-                            if (bord.cards[i].obj.transform.position == select_card.transform.position)
-                            {
-                                bord.selectedSpace = i;
-                                countDownFlag = true;
-
-                                // 挟んだカードが同タイプ
-                                if (bord.GetCardType(bord.selectedSpace) == tuckCard.front.type
-                                    && bord.GetCardType(bord.selectedSpace) == tuckCard.back.type)
-                                {
-                                    // カードの効果を変える
-                                   // CardBord.CardData newCard;
-                                    //newCard.type = DecideTuckCard(tuckCard.front.type, tuckCard.back.type);
-                                    //newCard.obj = null;
-                                    //CreateCards(ref newCard);
-                                    //if (newCard.obj != null)
-                                    {
-                                        //// 挟まれたカードの削除
-                                        //bord.DeleteCard(bord.selectedSpace);
-                                        //// 上記の位置に新しいカード
-                                        //bord.TuckCard(newCard, bord.selectedSpace);
-                                    }
-                                    //else
-                                    {
-                                        bord.TuckCard(tuckCard.front, bord.selectedSpace);
-                                        bord.TuckCard(tuckCard.back, bord.selectedSpace + 2);
-                                    }
-                                    //Destroy(newCard.obj);
-
-                                }
-                                else
-                                {
-                                    bord.TuckCard(tuckCard.front, bord.selectedSpace);
-                                    bord.TuckCard(tuckCard.back, bord.selectedSpace + 2);
-                                }
-
-                                // セットしたカード枚数を減らす
-                                cards[selectedCard].numHold--;
-
-                                break;
-                            }
+                            //// 挟まれたカードの削除
+                            //bord.DeleteCard(bord.selectedSpace);
+                            //// 上記の位置に新しいカード
+                            //bord.TuckCard(newCard, bord.selectedSpace);
                         }
+                        //else
+                        {
+                            bord.TuckCard(tuckCard.front, bord.selectedSpace);
+                            bord.TuckCard(tuckCard.back, bord.selectedSpace + 2);
+                        }
+                        //Destroy(newCard.obj);
                     }
+                    else
+                    {
+                        bord.TuckCard(tuckCard.front, bord.selectedSpace);
+                        bord.TuckCard(tuckCard.back, bord.selectedSpace + 2);
+                    }
+                    // セットしたカード枚数を減らす
+                    cards[selectedCard].numHold--;
+                    bord.Coordinate();
                 }
             }
 
@@ -355,7 +311,6 @@ public class CardManagement : MonoBehaviour {
                 bord.selectedSpace = bord.numSet - 1;
             }
         }
-
     }
 
     // 存在しないカードの生成
@@ -387,7 +342,8 @@ public class CardManagement : MonoBehaviour {
                     card.obj = Instantiate(finishCard);
                     break;
             }
-            card.obj.transform.parent = handsBord.transform; 
+            card.obj.transform.parent = handsBord.transform;
+            card.obj.transform.localScale = new Vector3(1.0f, 1.0f, 1.0f);
         }
     }
 
@@ -403,7 +359,7 @@ public class CardManagement : MonoBehaviour {
         const float zPos = -0.1f;
         // numSetting番目の位置に配置
         card.front.obj.transform.localPosition 
-            = new Vector3(firstPos.x + numSetting * posInterval, firstPos.y, zPos) / handsBord.transform.localScale.x;
+            = new Vector3(firstPos.x + numSetting * posInterval, firstPos.y, zPos);
         if (numSetting == selectedCard && cursor == CursorForcusTag.HandsBord)
             card.front.obj.transform.localPosition += new Vector3(0, 0, -0.1f);
         card.back.obj.transform.position = card.front.obj.transform.position + new Vector3(0.2f, 0.01f, 0.0f);
@@ -456,6 +412,12 @@ public class CardManagement : MonoBehaviour {
                 bord.usingCard++;
             else
                 type = CardType.Nothing;
+
+            //if (type == CardType.Move)
+            //{
+            //    //countDownFlag = true;
+            //}
+
             return type;
         }
         else
@@ -469,6 +431,12 @@ public class CardManagement : MonoBehaviour {
     public bool GetCountDownFlag()
     {
         return countDownFlag;
+    }
+
+    // カウントダウンフラグの状態を設定
+    public void SetCountDownFlag(bool flag)
+    {
+        countDownFlag = flag;
     }
 
     //  カードの情報関係 /////////////////////////////////////////////////////////////////////////////////

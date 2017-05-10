@@ -2,8 +2,16 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+//アクションの種類用定数
+struct CONSTANT
+{
+    public const int ACT_MOVE = 0;
+    public const int ACT_BREAK = 1;
+    public const int ACT_MOVE_BUCK = 2;
+}
+
 //各アクションの基底クラス
-public class BlockAction
+class BlockAction
 {
     //準備関数(引数は参照渡し)
     public virtual void Preparation(ref GameObject obj) { }
@@ -13,13 +21,12 @@ public class BlockAction
 }
 
 //動くアクションのクラス
-class BlockMove : BlockAction 
+class BlockMove : BlockAction
 {
     //スタートの時間
     private float m_start_time = 0.0f;
     //スタート位置
     private Vector3 m_start_pos = Vector3.zero;
-
 
     //準備関数、実行関数のオーバーライド(引数は参照渡し)
     override public void Preparation(ref GameObject obj) { Init(ref obj); }
@@ -34,22 +41,33 @@ class BlockMove : BlockAction
 
     public void Move(ref GameObject obj)
     {
-        //経過時間を移動時間で割る
-        float timeStep = (Time.time - m_start_time) / obj.GetComponent<ActionCountDown>().m_move_time;
-
-        //移動時間になったらフラグを止める
-        if (timeStep > 1.0f)
-        {
-            obj.GetComponent<ActionCountDown>().SetActionFlag(false);
-            
-        }
-
         //フラグがたっていたら移動(補間)
         if (obj.GetComponent<ActionCountDown>().GetActionFlag())
         {
-           obj.transform.position = (1 - timeStep) * m_start_pos + timeStep * (m_start_pos + obj.GetComponent<ActionCountDown>().m_move_distance);
-        }
-    }
+            //経過時間を移動時間で割る
+            float timeStep = (Time.time - m_start_time) / obj.GetComponent<ActionCountDown>().m_move_time;
+
+            obj.transform.position = (1 - timeStep) * m_start_pos + timeStep * (m_start_pos + obj.GetComponent<ActionCountDown>().m_move_distance);
+
+            //移動時間になったらフラグを止める
+            if (timeStep > 1.0f)
+            {
+                obj.GetComponent<ActionCountDown>().SetActionFlag(false);
+
+                GameObject manager = GameObject.Find("GameManager");
+                manager.GetComponent<GameManager>().SetGimmickFlag(false);
+
+                //繰り返しパターンなら
+                if (obj.GetComponent<ActionCountDown>().GetActionType() == CONSTANT.ACT_MOVE_BUCK)
+                {
+                    //繰り返しフラグをセット
+                    obj.GetComponent<ActionCountDown>().SetOldActionFlag(false);
+                    //移動距離を反転
+                    obj.GetComponent<ActionCountDown>().m_move_distance *= -1;
+                }
+            }  
+         }
+     }
 }
 
 //壊れるアクションのクラス
@@ -71,12 +89,8 @@ class BlockBreak : BlockAction
 }
 
 //実行クラス
-public class ActionCountDown : MonoBehaviour {
-
-    //アクションの種類用定数
-    const int ACT_MOVE = 0;
-    const int ACT_BREAK = 1;
-
+public class ActionCountDown : MonoBehaviour
+{
     //移動距離
     public Vector3 m_move_distance = Vector3.zero;
     //移動時間
@@ -88,26 +102,26 @@ public class ActionCountDown : MonoBehaviour {
 
     //アクションの種類
     [SerializeField]
-    public int m_action_type;
+    private int m_action_type;
 
     //自分を取得するための変数
-    public GameObject obj;
+    GameObject obj;
 
     //アクション
-    public BlockAction action = null;
-
-    //パーティクルタイミング
-    public bool PartTim;
-
+    private BlockAction action = null;
+    //GameObjectでColliderと触れているの要素数
+    private List<GameObject> ride = new List<GameObject>();
     // Use this for initialization
-    void Start () {
+    void Start()
+    {
         //指定したアクションタイプによってアクションを変更
-       switch(m_action_type)
+        switch (m_action_type)
         {
-            case ACT_MOVE:
+            case CONSTANT.ACT_MOVE:
+            case CONSTANT.ACT_MOVE_BUCK:
                 action = new BlockMove();
                 break;
-            case ACT_BREAK:
+            case CONSTANT.ACT_BREAK:
                 action = new BlockBreak();
                 break;
             default:
@@ -117,9 +131,10 @@ public class ActionCountDown : MonoBehaviour {
         //自身を取得
         obj = this.gameObject;
     }
-	
-	// Update is called once per frame
-	void Update () {
+
+    // Update is called once per frame
+    void Update()
+    {
         //カウントダウン
         GetCountZero();
 
@@ -127,24 +142,26 @@ public class ActionCountDown : MonoBehaviour {
         if (action != null)
         {
             //フラグが立ったらアクションの準備
-            if (m_action_flag == true && 
+            if (m_action_flag == true &&
                 m_action_flag != m_old_flag)
             {
+                GameObject manager = GameObject.Find("GameManager");
+                manager.GetComponent<GameManager>().SetGimmickFlag(true);
+
                 action.Preparation(ref obj);
                 m_old_flag = m_action_flag;
             }
-
             //アクションの実行
             action.Execute(ref obj);
-            PartTim = true;
+            //GameObjectの移動
+            foreach (GameObject otherObj in ride)
+            {
+                //動く床の位置にObjectの座標を合わせる
+                Vector3 v = otherObj.transform.position;
+                otherObj.transform.position = new Vector3(obj.transform.position.x, v.y, v.z);
+            }
         }
-        else
-        {
-            PartTim = false;
-        }
-
     }
-
     //カウントダウンによってフラグをあげる
     void GetCountZero()
     {
@@ -152,9 +169,19 @@ public class ActionCountDown : MonoBehaviour {
         if (obj.transform.FindChild("CountUI").GetComponent<CountDown>().GetCount() == 0 &&
             m_old_flag == false)
         {
+            //繰り返しパターンならカウントを戻す
+            if (m_action_type == CONSTANT.ACT_MOVE_BUCK)
+            { obj.transform.FindChild("CountUI").GetComponent<CountDown>().SetCount(); }
+            //フラグを上げる
             m_action_flag = true;
         }
-      
+
+    }
+
+    //アクションタイプを返す
+    public int GetActionType()
+    {
+        return m_action_type;
     }
 
     //アクションフラグを返す
@@ -169,9 +196,26 @@ public class ActionCountDown : MonoBehaviour {
         m_action_flag = flag;
     }
 
+    //繰り返し用アクションフラグを設定
+    public void SetOldActionFlag(bool flag)
+    {
+        m_old_flag = flag;
+    }
+
     //自身を破棄
     public void DestroyObject()
     {
         Destroy(this.gameObject);
+    }
+    //他のObjectが接触している時
+    void OnTriggerEnter(Collider otherObj)
+    {
+        ride.Add(otherObj.gameObject);
+    }
+    //他のObjectが離れている時
+    void OnTriggerExit(Collider otherObj)
+    {
+        //床から離れたので削除
+        ride.Remove(otherObj.gameObject);
     }
 }
