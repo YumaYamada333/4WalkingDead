@@ -53,7 +53,7 @@ public class CardManagement : MonoBehaviour {
     {
         // 前のカード 後ろのカード
         public CardBord.CardData front;
-        public CardBord.CardData back;
+        //public CardBord.CardData back;
         // 残り枚数の表示
         public GameObject numUI;
         // 所持数
@@ -171,10 +171,10 @@ public class CardManagement : MonoBehaviour {
         for (int i = 0; i < numCardSet; i++)
         {
             // オブジェクトの存在しないカードの生成
-            if (cards[i].numHold > 0 && cards[i].front.obj == null && cards[i].back.obj == null)
+            if (cards[i].numHold > 0 && cards[i].front.obj == null /*&& cards[i].back.obj == null*/)
             {
                 CreateCards(ref cards[i].front);
-                CreateCards(ref cards[i].back);
+                //CreateCards(ref cards[i].back);
                 // 残り枚数のUIの生成
                 cards[i].numUI = Instantiate(originalnumUI);
                 cards[i].numUI.transform.parent = handsBord.transform;
@@ -182,10 +182,10 @@ public class CardManagement : MonoBehaviour {
             }
 
             // 枚数0所持カードの破棄
-            if (cards[i].numHold == 0 && cards[i].front.obj == null && cards[i].back.obj == null)
+            if (cards[i].numHold == 0 && cards[i].front.obj == null /*&& cards[i].back.obj == null*/)
             {
                 DestroyCards(ref cards[i].front);
-                DestroyCards(ref cards[i].back);
+                //DestroyCards(ref cards[i].back);
                 // 残り枚数のUIの破棄
                 Destroy(cards[i].numUI);
             }
@@ -256,7 +256,7 @@ public class CardManagement : MonoBehaviour {
             {
                 // カードを移動
                 tuckCard.front.obj.transform.position = mouse_system.GetScreenPos();
-                tuckCard.back.obj.transform.position = mouse_system.GetScreenPos();
+                //tuckCard.back.obj.transform.position = mouse_system.GetScreenPos();
             }
             // してない
             else
@@ -270,7 +270,7 @@ public class CardManagement : MonoBehaviour {
 
                     // 挟んだカードが同タイプ
                     if (bord.GetCardType(bord.selectedSpace) == tuckCard.front.type
-                        && bord.GetCardType(bord.selectedSpace) == tuckCard.back.type)
+                        /*&& bord.GetCardType(bord.selectedSpace) == tuckCard.back.type*/)
                     {
                         // カードの効果を変える
                         // CardBord.CardData newCard;
@@ -287,14 +287,14 @@ public class CardManagement : MonoBehaviour {
                         //else
                         {
                             bord.TuckCard(tuckCard.front, bord.selectedSpace);
-                            bord.TuckCard(tuckCard.back, bord.selectedSpace + 2);
+                            //bord.TuckCard(tuckCard.back, bord.selectedSpace + 2);
                         }
                         //Destroy(newCard.obj);
                     }
                     else
                     {
                         bord.TuckCard(tuckCard.front, bord.selectedSpace);
-                        bord.TuckCard(tuckCard.back, bord.selectedSpace + 2);
+                        //bord.TuckCard(tuckCard.back, bord.selectedSpace + 2);
                     }
                     // セットしたカード枚数を減らす
                     cards[selectedCard].numHold--;
@@ -362,7 +362,7 @@ public class CardManagement : MonoBehaviour {
             = new Vector3(firstPos.x + numSetting * posInterval, firstPos.y, zPos);
         if (numSetting == selectedCard && cursor == CursorForcusTag.HandsBord)
             card.front.obj.transform.localPosition += new Vector3(0, 0, -0.1f);
-        card.back.obj.transform.position = card.front.obj.transform.position + new Vector3(0.2f, 0.01f, 0.0f);
+        //card.back.obj.transform.position = card.front.obj.transform.position + new Vector3(0.2f, 0.01f, 0.0f);
         numSetting++;
     }
 
@@ -370,7 +370,7 @@ public class CardManagement : MonoBehaviour {
     void SetCard(CardType front, CardType back, int num = 1)
     {
         cards[numCardSet].front.type = front;
-        cards[numCardSet].back.type = back;
+        //cards[numCardSet].back.type = back;
         cards[numCardSet].numHold += num;
         numCardSet++;
     }
@@ -412,6 +412,12 @@ public class CardManagement : MonoBehaviour {
                 bord.usingCard++;
             else
                 type = CardType.Nothing;
+
+            if (type == CardType.Move)
+            {
+                countDownFlag = true;
+            }
+
             return type;
         }
         else
