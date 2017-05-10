@@ -51,8 +51,8 @@ public class ParticaleScript : MonoBehaviour
     {
         //プレイヤーのアクションを判別
         particleCnt = act.particleCnt;
-        BlockPartical = actDown.m_action_type;
-        flag = actDown.PartTim;
+        //BlockPartical = actDown.m_action_type;
+        //flag = actDown.PartTim;
 
         //アクションの種類によってパーティカルを発生
         switch (particleCnt)
