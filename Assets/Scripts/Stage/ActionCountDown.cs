@@ -11,7 +11,7 @@ struct CONSTANT
 }
 
 //各アクションの基底クラス
-class BlockAction
+public class BlockAction
 {
     //準備関数(引数は参照渡し)
     public virtual void Preparation(ref GameObject obj) { }
@@ -21,16 +21,25 @@ class BlockAction
 }
 
 //動くアクションのクラス
-class BlockMove : BlockAction
+public class BlockMove : BlockAction
 {
     //スタートの時間
     private float m_start_time = 0.0f;
     //スタート位置
     private Vector3 m_start_pos = Vector3.zero;
 
+    //パーティクルフラグ取得
+    private bool PartTim;
+
     //準備関数、実行関数のオーバーライド(引数は参照渡し)
     override public void Preparation(ref GameObject obj) { Init(ref obj); }
     override public void Execute(ref GameObject obj) { Move(ref obj); }
+
+    //パーティカルフラグを返す関数
+    public bool GetFlag()
+    {
+        return PartTim;
+    }
 
     public void Init(ref GameObject obj)
     {
@@ -54,6 +63,11 @@ class BlockMove : BlockAction
             {
                 obj.GetComponent<ActionCountDown>().SetActionFlag(false);
 
+                GameObject manager = GameObject.Find("GameManager");
+                manager.GetComponent<GameManager>().SetGimmickFlag(false);
+
+                PartTim = true;
+
                 //繰り返しパターンなら
                 if (obj.GetComponent<ActionCountDown>().GetActionType() == CONSTANT.ACT_MOVE_BUCK)
                 {
@@ -62,16 +76,28 @@ class BlockMove : BlockAction
                     //移動距離を反転
                     obj.GetComponent<ActionCountDown>().m_move_distance *= -1;
                 }
+            }
+            else
+            {
+                PartTim = false;
             }  
          }
      }
 }
 
 //壊れるアクションのクラス
-class BlockBreak : BlockAction
+public class BlockBreak : BlockAction
 {
 
     override public void Execute(ref GameObject obj) { Break(ref obj); }
+
+    ////パーティクルフラグ取得
+    //private bool PartTim;
+
+    //public bool GetFlag()
+    //{
+    //    return PartTim;
+    //}
 
     public void Break(ref GameObject obj)
     {
@@ -81,7 +107,12 @@ class BlockBreak : BlockAction
             //オブジェクトを破棄
             obj.GetComponent<ActionCountDown>().SetActionFlag(false);
             obj.GetComponent<ActionCountDown>().DestroyObject();
+            //PartTim = true;
         }
+        //else
+        //{
+        //    PartTim = false;
+        //}
     }
 }
 
@@ -108,6 +139,10 @@ public class ActionCountDown : MonoBehaviour
     private BlockAction action = null;
     //GameObjectでColliderと触れているの要素数
     private List<GameObject> ride = new List<GameObject>();
+
+    //パーティクルフラグ取得
+    public bool PartTim;
+
     // Use this for initialization
     void Start()
     {
@@ -142,6 +177,9 @@ public class ActionCountDown : MonoBehaviour
             if (m_action_flag == true &&
                 m_action_flag != m_old_flag)
             {
+                GameObject manager = GameObject.Find("GameManager");
+                manager.GetComponent<GameManager>().SetGimmickFlag(true);
+
                 action.Preparation(ref obj);
                 m_old_flag = m_action_flag;
             }
@@ -154,6 +192,11 @@ public class ActionCountDown : MonoBehaviour
                 Vector3 v = otherObj.transform.position;
                 otherObj.transform.position = new Vector3(obj.transform.position.x, v.y, v.z);
             }
+            PartTim = true;
+        }
+        else
+        {
+            PartTim = false;
         }
     }
     //カウントダウンによってフラグをあげる

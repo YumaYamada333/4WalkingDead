@@ -54,11 +54,16 @@ public class PlayerAction : MonoBehaviour
     private AudioSource audioSource;     //音
     private Animator animator;        //アニメーター
     private CharacterController controller;  //charactercontroller
+
     //音
     public AudioClip Attack;
     public AudioClip Jump;
     public AudioClip Hit;
     public AudioClip Move;
+
+    //パーティクルカウント
+    public int particleCnt = 0;
+
     void OnEnable() //objが生きている場合
     {
         if (time <= 0)
@@ -76,11 +81,15 @@ public class PlayerAction : MonoBehaviour
         animator = GetComponent<Animator>();
         audioSource = gameObject.GetComponent<AudioSource>();
         controller = GetComponent<CharacterController>();
+
     }
 
     // Update is called once per frame
     void Update()
     {
+        ////パーティカルカウントを戻す
+        //particleCnt = false;
+
         //(使うかもしれないのでコメントアウト)
         //Ray ray = new Ray(transform.position /*+ new Vector3(0,0.1f,0)*/, Vector3.down); //ray
         //RaycastHit hit; //rayと接触したcolliderの判定
@@ -177,8 +186,8 @@ public class PlayerAction : MonoBehaviour
             Destroy(enemy[i]);
             //音を出す
             audioSource.PlayOneShot(Hit);
-            //エフェクト再生
-            EffekseerHandle e_damage = EffekseerSystem.PlayEffect("EnemyDamage", transform.position);
+            ////エフェクト再生
+            //EffekseerHandle e_damage = EffekseerSystem.PlayEffect("EnemyDamage", transform.position);
         }
     }
     //----------------------------------------------------------------------
@@ -298,8 +307,12 @@ public class PlayerAction : MonoBehaviour
                     animationFlag[animationFlagNum] = false;
                     //アニメーションを止める
                     animator.SetBool(animation, false);
+                    //カウントダウンフラグを立てる
+                    GameObject card_manager = GameObject.Find("CardManager");
+                    card_manager.GetComponent<CardManagement>().SetCountDownFlag(true);
                     //次の場所との差
                     endPosition += nextPosition;
+                    particleCnt = 0;
                 }
             }
 
@@ -334,7 +347,8 @@ public class PlayerAction : MonoBehaviour
                     cardSetFlag = true;                 //カードセットフラグ
                     animationNum = (int)ANIMATION.RUN;  //アニメーションの番号
                     animationName = "Run";              //アニメーションの名前
-                    EffekseerHandle run = EffekseerSystem.PlayEffect("smoke", transform.position);  //エフェクト再生
+                    //EffekseerHandle run = EffekseerSystem.PlayEffect("smoke", transform.position);  //エフェクト再生
+                    particleCnt = 1;               //パーティクルの再生
                     break;
                 //jump
                 case CardManagement.CardType.Jump:
@@ -342,6 +356,7 @@ public class PlayerAction : MonoBehaviour
                     cardSetFlag = true;                 //カードセットフラグ
                     animationNum = (int)ANIMATION.JUMP; //アニメーションの番号
                     animationName = "Jump";             //アニメーションの名前
+                    particleCnt = 0;
                     break;
                 //attack
                 case CardManagement.CardType.Attack:
@@ -349,7 +364,8 @@ public class PlayerAction : MonoBehaviour
                     cardSetFlag = true;                     //カードセットフラグ
                     animationNum = (int)ANIMATION.ATTACK;   //アニメーションの番号
                     animationName = "Attack";               //アニメーションの名前
-                    EffekseerHandle attack = EffekseerSystem.PlayEffect("attake", transform.position);
+                    //EffekseerHandle attack = EffekseerSystem.PlayEffect("attake", transform.position);
+                    particleCnt = 2;                 //パーティクルの再生
                     break;
 
                 // スーパーシリーズ //
@@ -397,10 +413,19 @@ public class PlayerAction : MonoBehaviour
         //プレイヤーと敵が当たったら
         if (coll.gameObject.tag == "Enemy")
         {
-            //エフェクト再生
-            EffekseerHandle p_damage = EffekseerSystem.PlayEffect("PlayerDamage", transform.position);
+            //パーティクルの再生
+            particleCnt = 3;
+
+            //////エフェクト再生
+            //EffekseerHandle p_damage = EffekseerSystem.PlayEffect("PlayerDamage", transform.position);
+
             // 五秒後にゲームオーバー
             GameObject.Find("GameManager").GetComponent<ToResultScene>().ToOver(2, ToResultScene.OverType.FALL);
+        }
+        else
+        {
+            //パーティクルの停止
+            particleCnt = 0;
         }
 
         //トゲ
@@ -448,8 +473,16 @@ public class PlayerAction : MonoBehaviour
                 //middlePosを超えたら
                 if (diff > time)
                 {
-                    //エフェクトの再生
-                    EffekseerHandle jump = EffekseerSystem.PlayEffect("Landing", transform.position);
+                    ////エフェクトの再生
+                    //EffekseerHandle jump = EffekseerSystem.PlayEffect("Landing", transform.position);
+
+                    //パーティクルの再生
+                    particleCnt = 4;
+                }
+                else
+                {
+                    //パーティクルの停止
+                    particleCnt = 0;
                 }
             }
         }

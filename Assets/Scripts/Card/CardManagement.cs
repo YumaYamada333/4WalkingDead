@@ -53,7 +53,6 @@ public class CardManagement : MonoBehaviour {
     {
         // 前のカード 後ろのカード
         public CardBord.CardData front;
-        //public CardBord.CardData back;
         // 残り枚数の表示
         public GameObject numUI;
         // 所持数
@@ -174,7 +173,6 @@ public class CardManagement : MonoBehaviour {
             if (cards[i].numHold > 0 && cards[i].front.obj == null /*&& cards[i].back.obj == null*/)
             {
                 CreateCards(ref cards[i].front);
-                //CreateCards(ref cards[i].back);
                 // 残り枚数のUIの生成
                 cards[i].numUI = Instantiate(originalnumUI);
                 cards[i].numUI.transform.parent = handsBord.transform;
@@ -261,7 +259,6 @@ public class CardManagement : MonoBehaviour {
             {
                 // カードを移動
                 tuckCard.front.obj.transform.position = mouse_system.GetScreenPos();
-                //tuckCard.back.obj.transform.position = mouse_system.GetScreenPos();
             }
             // してない
             else
@@ -274,8 +271,7 @@ public class CardManagement : MonoBehaviour {
                     countDownFlag = true;
 
                     // 挟んだカードが同タイプ
-                    if (bord.GetCardType(bord.selectedSpace) == tuckCard.front.type
-                        /*&& bord.GetCardType(bord.selectedSpace) == tuckCard.back.type*/)
+                    if (bord.GetCardType(bord.selectedSpace) == tuckCard.front.type)
                     {
                         // カードの効果を変える
                         // CardBord.CardData newCard;
@@ -292,14 +288,12 @@ public class CardManagement : MonoBehaviour {
                         //else
                         {
                             bord.TuckCard(tuckCard.front, bord.selectedSpace);
-                            //bord.TuckCard(tuckCard.back, bord.selectedSpace + 2);
                         }
                         //Destroy(newCard.obj);
                     }
                     else
                     {
                         bord.TuckCard(tuckCard.front, bord.selectedSpace);
-                        //bord.TuckCard(tuckCard.back, bord.selectedSpace + 2);
                     }
                     // セットしたカード枚数を減らす
                     cards[selectedCard].numHold--;
@@ -368,7 +362,6 @@ public class CardManagement : MonoBehaviour {
             = new Vector3(firstPos.x + numSetting * posInterval, firstPos.y, zPos);
         if (numSetting == selectedCard && cursor == CursorForcusTag.HandsBord)
             card.front.obj.transform.localPosition += new Vector3(0, 0, -0.1f);
-        //card.back.obj.transform.position = card.front.obj.transform.position + new Vector3(0.2f, 0.01f, 0.0f);
         numSetting++;
     }
 
@@ -376,7 +369,6 @@ public class CardManagement : MonoBehaviour {
     void SetCard(CardType front, CardType back, int num = 1)
     {
         cards[numCardSet].front.type = front;
-        //cards[numCardSet].back.type = back;
         cards[numCardSet].numHold += num;
         numCardSet++;
     }
@@ -419,10 +411,10 @@ public class CardManagement : MonoBehaviour {
             else
                 type = CardType.Nothing;
 
-            if (type == CardType.Move)
-            {
-                countDownFlag = true;
-            }
+            //if (type == CardType.Move)
+            //{
+            //    //countDownFlag = true;
+            //}
 
             return type;
         }
@@ -437,6 +429,12 @@ public class CardManagement : MonoBehaviour {
     public bool GetCountDownFlag()
     {
         return countDownFlag;
+    }
+
+    // カウントダウンフラグの状態を設定
+    public void SetCountDownFlag(bool flag)
+    {
+        countDownFlag = flag;
     }
 
     //  カードの情報関係 /////////////////////////////////////////////////////////////////////////////////
