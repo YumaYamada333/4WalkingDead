@@ -416,21 +416,13 @@ public class PlayerAction : MonoBehaviour
         //プレイヤーと敵が当たったら
         if (coll.gameObject.tag == "Enemy")
         {
-<<<<<<< HEAD
-            //エフェクト再生
-            EffekseerHandle p_damage = EffekseerSystem.PlayEffect("PlayerDamage", transform.position);
-            // ２秒後にゲームオーバー
-            GameObject.Find("GameManager").GetComponent<ToResultScene>().ToOver(Constants.OverTime);
-=======
             //パーティクルの再生
             particleCnt = 3;
-
             //////エフェクト再生
             //EffekseerHandle p_damage = EffekseerSystem.PlayEffect("PlayerDamage", transform.position);
+            // ２秒後にゲームオーバー
+            GameObject.Find("GameManager").GetComponent<ToResultScene>().ToOver(Constants.OverTime);
 
-            // 五秒後にゲームオーバー
-            GameObject.Find("GameManager").GetComponent<ToResultScene>().ToOver(2, ToResultScene.OverType.FALL);
->>>>>>> master
         }
         else
         {
