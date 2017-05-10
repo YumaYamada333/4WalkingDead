@@ -298,6 +298,9 @@ public class PlayerAction : MonoBehaviour
                     animationFlag[animationFlagNum] = false;
                     //アニメーションを止める
                     animator.SetBool(animation, false);
+                    //カウントダウンフラグを立てる
+                    GameObject card_manager = GameObject.Find("CardManager");
+                    card_manager.GetComponent<CardManagement>().SetCountDownFlag(true);
                     //次の場所との差
                     endPosition += nextPosition;
                 }

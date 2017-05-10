@@ -54,6 +54,9 @@ class BlockMove : BlockAction
             {
                 obj.GetComponent<ActionCountDown>().SetActionFlag(false);
 
+                GameObject manager = GameObject.Find("GameManager");
+                manager.GetComponent<GameManager>().SetGimmickFlag(false);
+
                 //繰り返しパターンなら
                 if (obj.GetComponent<ActionCountDown>().GetActionType() == CONSTANT.ACT_MOVE_BUCK)
                 {
@@ -142,6 +145,9 @@ public class ActionCountDown : MonoBehaviour
             if (m_action_flag == true &&
                 m_action_flag != m_old_flag)
             {
+                GameObject manager = GameObject.Find("GameManager");
+                manager.GetComponent<GameManager>().SetGimmickFlag(true);
+
                 action.Preparation(ref obj);
                 m_old_flag = m_action_flag;
             }
