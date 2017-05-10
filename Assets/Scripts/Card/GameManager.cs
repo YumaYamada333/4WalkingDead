@@ -20,6 +20,8 @@ public class GameManager : MonoBehaviour
     //player
     private GameObject playerAction;
 
+    [SerializeField]
+    bool m_gimmick_move_flag = false;
 
     // ゲームの状態
     public enum GameState
@@ -100,5 +102,15 @@ public class GameManager : MonoBehaviour
     public GameState GetGameState()
     {
         return gameState;
+    }
+
+    public bool GetGimmickFlag()
+    {
+        return m_gimmick_move_flag;
+    }
+
+    public void SetGimmickFlag(bool flag)
+    {
+        m_gimmick_move_flag = flag;
     }
 }
