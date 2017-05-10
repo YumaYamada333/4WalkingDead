@@ -14,16 +14,17 @@ using UnityEngine;
 //定数の定義
 static class Constants
 {
-    public const int Attack = 1;  //attak
+    public const int Attack = 1;        //attak
     public const int StageHeight = 2;  //ステージの高さ
+    public const int RunPow = 2;       //走る距離
     public const int SuperAttack = 3;  //superattack
-    public const int MaxEnemy = 4;  //敵の数
-    public const int MaxJumpPow = 5;  //最大のジャンプ力
-    public const int MaxAnimation = 6;  //最大のアニメーションの数
-    public const int MaxTime = 10;  //最大時間
-    public const int MoveCount = 60;  //移動エフェクトのループ再生する間隔
+    public const int MaxEnemy = 4;     //敵の数
+    public const int MaxJumpPow = 5;   //最大のジャンプ力
+    public const int MaxAnimation = 6; //最大のアニメーションの数
+    public const int MaxTime = 10;     //最大時間
+    public const int MoveCount = 60;   //移動エフェクトのループ再生する間隔
 
-    public const float Adjustment = 0.5f; //調整
+    public const float Adjustment = 0.5f;   //調整
     public const float MassDistance = 2.2f; //マスの距離
 }
 //アニメーション
@@ -97,7 +98,7 @@ public class PlayerAction : MonoBehaviour
 
         //}
         //走っている場合
-        if (animationFlag[(int)ANIMATION.RUN] )
+        if (animationFlag[(int)ANIMATION.RUN])
         {
             if (isGround)       //地面についている
                 middlePosition.y = transform.position.y;    //中央地点yを今のプレイヤーの座標にする
@@ -191,7 +192,7 @@ public class PlayerAction : MonoBehaviour
     {
         //待機中の場合
         if (animationFlag[(int)ANIMATION.RUN] == false && animationFlag[(int)ANIMATION.JUMP] == false && animationFlag[(int)ANIMATION.ATTACK] == false)// &&
-           // animationFlag[(int)ANIMATION.SUPERRUN] == false && animationFlag[(int)ANIMATION.SUPERJUMP] == false && animationFlag[(int)ANIMATION.SUPERATTACK] == false)
+                                                                                                                                                       // animationFlag[(int)ANIMATION.SUPERRUN] == false && animationFlag[(int)ANIMATION.SUPERJUMP] == false && animationFlag[(int)ANIMATION.SUPERATTACK] == false)
         {
             idleFlag = true;
         }
@@ -226,13 +227,15 @@ public class PlayerAction : MonoBehaviour
             {
                 //run
                 case (int)ANIMATION.RUN:
+                    middlePosition.x = transform.position.x + Constants.RunPow / 2;
+                    endPosition.x = transform.position.x + Constants.RunPow;
                     break;
                 //jump
                 case (int)ANIMATION.JUMP:
                     //middlePosにjumpPowを足す
-                    middlePosition = new Vector3(middlePosition.x + nextPosition.x / 2, middlePosition.y += jumpPower, 0);
+                    middlePosition = new Vector3(transform.position.x + Constants.RunPow, middlePosition.y += jumpPower, 0);
                     //終点を決める
-                    endPosition = new Vector3(endPosition.x + nextPosition.x, endPosition.y, 0);
+                    endPosition = new Vector3(transform.position.x + Constants.RunPow * 2, endPosition.y, 0);
                     break;
                 //attack
                 case (int)ANIMATION.ATTACK:
@@ -241,28 +244,28 @@ public class PlayerAction : MonoBehaviour
                     //移動しない
                     endPosition = new Vector3(transform.position.x, endPosition.y, 0);
                     break;
-                //スーパーシリーズ//
-                //superRun
-                //case (int)ANIMATION.SUPERRUN:
-                //    //1.5マス進む
-                //    middlePosition = new Vector3(middlePosition.x + nextPosition.x, middlePosition.y, 0);
-                //    //3マス進む
-                //    endPosition = new Vector3(endPosition.x + nextPosition.x * 2, endPosition.y, 0);
-                //    break;
-                ////superJump
-                //case (int)ANIMATION.SUPERJUMP:
-                //    //middlePosにjumpPowを足す
-                //    middlePosition = new Vector3(middlePosition.x + nextPosition.x / 2, middlePosition.y += jumpPower * 2, 0);
-                //    //2マス進む
-                //    endPosition = new Vector3(endPosition.x + nextPosition.x, endPosition.y, 0);
-                //    break;
-                ////superAttack
-                //case (int)ANIMATION.SUPERATTACK:
-                //    //移動しない
-                //    middlePosition = new Vector3(transform.position.x, middlePosition.y, 0);
-                //    //移動しない
-                //    endPosition = new Vector3(transform.position.x, endPosition.y, 0);
-                //    break;
+                    //スーパーシリーズ//
+                    //superRun
+                    //case (int)ANIMATION.SUPERRUN:
+                    //    //1.5マス進む
+                    //    middlePosition = new Vector3(middlePosition.x + nextPosition.x, middlePosition.y, 0);
+                    //    //3マス進む
+                    //    endPosition = new Vector3(endPosition.x + nextPosition.x * 2, endPosition.y, 0);
+                    //    break;
+                    ////superJump
+                    //case (int)ANIMATION.SUPERJUMP:
+                    //    //middlePosにjumpPowを足す
+                    //    middlePosition = new Vector3(middlePosition.x + nextPosition.x / 2, middlePosition.y += jumpPower * 2, 0);
+                    //    //2マス進む
+                    //    endPosition = new Vector3(endPosition.x + nextPosition.x, endPosition.y, 0);
+                    //    break;
+                    ////superAttack
+                    //case (int)ANIMATION.SUPERATTACK:
+                    //    //移動しない
+                    //    middlePosition = new Vector3(transform.position.x, middlePosition.y, 0);
+                    //    //移動しない
+                    //    endPosition = new Vector3(transform.position.x, endPosition.y, 0);
+                    //    break;
 
             }
 
