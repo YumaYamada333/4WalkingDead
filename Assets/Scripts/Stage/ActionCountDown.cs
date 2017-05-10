@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 //各アクションの基底クラス
-class BlockAction
+public class BlockAction
 {
     //準備関数(引数は参照渡し)
     public virtual void Preparation(ref GameObject obj) { }
@@ -19,6 +19,7 @@ class BlockMove : BlockAction
     private float m_start_time = 0.0f;
     //スタート位置
     private Vector3 m_start_pos = Vector3.zero;
+
 
     //準備関数、実行関数のオーバーライド(引数は参照渡し)
     override public void Preparation(ref GameObject obj) { Init(ref obj); }
@@ -40,6 +41,7 @@ class BlockMove : BlockAction
         if (timeStep > 1.0f)
         {
             obj.GetComponent<ActionCountDown>().SetActionFlag(false);
+            
         }
 
         //フラグがたっていたら移動(補間)
@@ -86,13 +88,16 @@ public class ActionCountDown : MonoBehaviour {
 
     //アクションの種類
     [SerializeField]
-    private int m_action_type;
+    public int m_action_type;
 
     //自分を取得するための変数
-    GameObject obj;
+    public GameObject obj;
 
     //アクション
-    private BlockAction action = null;
+    public BlockAction action = null;
+
+    //パーティクルタイミング
+    public bool PartTim;
 
     // Use this for initialization
     void Start () {
@@ -131,8 +136,13 @@ public class ActionCountDown : MonoBehaviour {
 
             //アクションの実行
             action.Execute(ref obj);
-
+            PartTim = true;
         }
+        else
+        {
+            PartTim = false;
+        }
+
     }
 
     //カウントダウンによってフラグをあげる
