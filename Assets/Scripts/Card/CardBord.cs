@@ -29,6 +29,9 @@ public class CardBord : MonoBehaviour {
     // 中心のカード
     int centerCard;
 
+    // スクロールの状態
+    float scrollStep;
+
     // 使用中カード
     public int usingCard;
 
@@ -62,7 +65,7 @@ public class CardBord : MonoBehaviour {
         //numSet = 0;
         usingCard = 0;
         exceedFlag = false;
-
+        scrollStep = 0.0f;
         // MouseSystemコンポーネントの取得
         mouse_system = GameObject.Find("MouseSystem").GetComponent<MouseSystem>();
         state = GameObject.Find("GameManager").GetComponent<GameManager>();
@@ -90,7 +93,7 @@ public class CardBord : MonoBehaviour {
             //else
             //{
             cards[i].obj.transform.localPosition = 
-                new Vector3(cardSize.x / 2 + (i - centerCard) * cardSize.x - GetComponent<RectTransform>().sizeDelta.x / 2, 0.0f, zPos);
+                new Vector3(cardSize.x / 2 + (i - centerCard) * cardSize.x - GetComponent<RectTransform>().sizeDelta.x / 2 + scrollStep, 0.0f, zPos);
             //}
         }
     }
@@ -221,8 +224,23 @@ public class CardBord : MonoBehaviour {
 
                 }
             }
+
+            // boardからはみ出たＣａｒｄの非表示化
+            RectTransform size = gameObject.GetComponent<RectTransform>();
+            for (int i = usingCard; i < numSet; i++)
+            {
+                if (cards[i].obj.transform.localPosition.x >= transform.localPosition.x + size.sizeDelta.x / 2)
+                {
+                    cards[i].obj.SetActive(false);
+                }
+                else
+                {
+                    cards[i].obj.SetActive(true);
+                }
+            }
+
         }
-	}
+    }
 
     // ボードにカードをセットする
     public bool SetCard(GameObject obj, CardManagement.CardType type)
@@ -279,8 +297,69 @@ public class CardBord : MonoBehaviour {
         return true;
     }
 
-    // 使用中カードの取得
-    public CardManagement.CardType GetCardType(int no = -1)
+    public void ScrollToLeft()
+    {
+        //// カードの座標設定
+        //for (int i = 0; i < numSetMax; i++)
+        //{
+        //    //セットカードの枠を超えたら
+        //    if (cards[i].obj.transform.localPosition.x >= 0.5f)
+        //    {
+        //        //フラグを立てる
+        //        exceedFlag = true;
+        //    }
+
+        //    //枠を超えたら
+        //    if (exceedFlag == true)
+        //    {
+                // カードの座標設定
+                for (int j = 0; j < numSetMax; j++)
+                {
+                    if (cards[j].obj == null) continue;
+
+                    //左スクロール
+                    cards[j].obj.transform.localPosition -= new Vector3(cardSize.x, 0, 0);
+                }
+    //        }
+                scrollStep -= cardSize.x;
+    //    }
+    //}
+
+}
+
+public void ScrollToRight()
+    {
+        //// カードの座標設定
+        //for (int i = 0; i < numSetMax; i++)
+        //{
+        //    //セットカードの枠を超えたら
+        //    if (cards[i].obj.transform.localPosition.x >= 0.5f)
+        //    {
+        //        //フラグを立てる
+        //        exceedFlag = true;
+        //    }
+
+        //    //枠を超えたら
+        //    if (exceedFlag == true)
+        //    {
+        //        // カードの座標設定
+        for (int j = 0; j < numSetMax; j++)
+        {
+            if (cards[j].obj == null) continue;
+            //            if (Input.GetAxis("CardScroll") > 0)
+            //            {
+            //右スクロール
+            cards[j].obj.transform.localPosition += new Vector3(cardSize.x, 0, 0);
+            //            }
+            //            else if (Input.GetAxis("CardScroll") < 0)
+        }
+        scrollStep += cardSize.x;
+        //    }
+        //}
+    }
+
+// 使用中カードの取得
+public CardManagement.CardType GetCardType(int no = -1)
     {
         if (no == -1)
             return cards[usingCard].type;
