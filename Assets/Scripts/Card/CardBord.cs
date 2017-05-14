@@ -66,6 +66,7 @@ public class CardBord : MonoBehaviour {
         usingCard = 0;
         exceedFlag = false;
         scrollStep = 0.0f;
+
         // MouseSystemコンポーネントの取得
         mouse_system = GameObject.Find("MouseSystem").GetComponent<MouseSystem>();
         state = GameObject.Find("GameManager").GetComponent<GameManager>();
@@ -92,7 +93,8 @@ public class CardBord : MonoBehaviour {
             //}
             //else
             //{
-            cards[i].obj.transform.localPosition = 
+            cards[i].obj.transform.localPosition =
+                //new Vector3(cardSize.x / 2 + (i - centerCard) * cardSize.x - GetComponent<RectTransform>().sizeDelta.x / 2, 0.0f, zPos);
                 new Vector3(cardSize.x / 2 + (i - centerCard) * cardSize.x - GetComponent<RectTransform>().sizeDelta.x / 2 + scrollStep, 0.0f, zPos);
             //}
         }
@@ -154,6 +156,7 @@ public class CardBord : MonoBehaviour {
                 // カードの座標設定
                 for (int i = 0; i < numSetMax; i++)
                 {
+                    if (cards[i].obj == null) continue;
                     //セットカードの枠を超えたら
                     if (cards[i].obj.transform.localPosition.x >= 0.5f)
                     {
@@ -167,16 +170,16 @@ public class CardBord : MonoBehaviour {
                         // カードの座標設定
                         for (int j = 0; j < numSetMax; j++)
                         {
-
+                            if (cards[j].obj == null) continue;
                             if (Input.GetAxis("CardScroll") > 0)
                             {
                                 //右スクロール
-                                cards[j].obj.transform.localPosition += new Vector3(0.005f, 0, 0);
+                                cards[j].obj.transform.localPosition += new Vector3(0.5f, 0, 0);
                             }
                             else if (Input.GetAxis("CardScroll") < 0)
                             {
                                 //左スクロール
-                                cards[j].obj.transform.localPosition -= new Vector3(0.005f, 0, 0);
+                                cards[j].obj.transform.localPosition -= new Vector3(0.5f, 0, 0);
                             }
                         }
                     }
@@ -212,9 +215,9 @@ public class CardBord : MonoBehaviour {
             }
         }
 
-        // 使用済みカードの非表示化
         if (true)
         {
+            // 使用済みカードの非表示化
             if (usingCard <= numSetMax && usingCard > 0)
             {
                 if (cards[usingCard].obj && cards[usingCard - 1].obj)
@@ -227,9 +230,14 @@ public class CardBord : MonoBehaviour {
 
             // boardからはみ出たＣａｒｄの非表示化
             RectTransform size = gameObject.GetComponent<RectTransform>();
-            for (int i = usingCard; i < numSet; i++)
+            // boardの右端から出たカードを非表示
+            for (int i = usingCard; i < numSetMax; i++)
             {
-                if (cards[i].obj.transform.localPosition.x >= transform.localPosition.x + size.sizeDelta.x / 2)
+                if (cards[i].obj == null) continue;
+                if (cards[i].obj.transform.position.x + cardSize.x>= 
+                    transform.position.x + GetComponent<RectTransform>().sizeDelta.x / 2 ||
+                    cards[i].obj.transform.position.x - cardSize.x <=
+                    transform.position.x - GetComponent<RectTransform>().sizeDelta.x / 2)
                 {
                     cards[i].obj.SetActive(false);
                 }
@@ -238,7 +246,6 @@ public class CardBord : MonoBehaviour {
                     cards[i].obj.SetActive(true);
                 }
             }
-
         }
     }
 
@@ -358,8 +365,8 @@ public void ScrollToRight()
         //}
     }
 
-// 使用中カードの取得
-public CardManagement.CardType GetCardType(int no = -1)
+    // 使用中カードの取得
+    public CardManagement.CardType GetCardType(int no = -1)
     {
         if (no == -1)
             return cards[usingCard].type;

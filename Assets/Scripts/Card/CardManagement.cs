@@ -197,6 +197,7 @@ public class CardManagement : MonoBehaviour {
             if (cards[i].numHold == 0 && cards[i].front.obj != null)
             {
                 DestroyCards(ref cards[i].front);
+                numCardSet--;
                 for (int j = i; j < numCardSet; j++)
                 {
                     cards[j] = cards[j + 1];
@@ -208,7 +209,7 @@ public class CardManagement : MonoBehaviour {
             // 残り枚数のUIの更新
             //cards[i].numUI.GetComponent<TextMesh>().text = cards[i].numHold.ToString();
 
-            if (cursor == CursorForcusTag.HandsBord)
+            if (cursor == CursorForcusTag.HandsBord && cards[i].front.obj != null)
             {
                 // カードの配置
                 SetCardPosition(ref cards[i]);
@@ -361,7 +362,8 @@ public class CardManagement : MonoBehaviour {
     // カード破棄
     void DestroyCards(ref CardBord.CardData card)
     {
-            Destroy(card.obj);
+        Destroy(card.obj);
+        card.obj = null;
     }
 
     // 存在する所持カードの配置

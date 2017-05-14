@@ -17,6 +17,11 @@ public class Button : MonoBehaviour {
     //リセットボタン
     private GameObject ResetButton;
 
+    [SerializeField]
+    private GameObject ScrollLeftButton;
+    [SerializeField]
+    private GameObject ScrollRifhtButton;
+
     //private float BordPosition_x;
     //private float BordPosition_y;
     //private float BordPosition_z;
@@ -80,7 +85,8 @@ public class Button : MonoBehaviour {
         {
             ActionBord.transform.localPosition = actPosActionBord/* + mainCamera.transform.position - firstPos*/;
         }
-
+        CardBord board = ActionBord.GetComponent<CardBord>();
+        
     }
 
     public void OnClick()

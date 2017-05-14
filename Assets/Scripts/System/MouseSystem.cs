@@ -7,8 +7,6 @@ public class MouseSystem : MonoBehaviour {
     Vector3 screen_pos;    //マウスのスクリーン座標
     Vector3 world_pos;     //マウスのワールド座標
 
-    GameObject[] checkList;  // マウスとの判定を行うもののリスト
-
     // Use this for initialization
     void Start ()
     {
@@ -64,7 +62,7 @@ public class MouseSystem : MonoBehaviour {
 
     public int GetMouseHit(GameObject board)
     {
-        //if (Collider(board))
+        if (board.activeSelf/*Collider(board)*/)
         {
             if (board.name == "HandsBord")
             {
@@ -93,7 +91,13 @@ public class MouseSystem : MonoBehaviour {
                     {
                         if (Collider(cards[i].obj))
                         {
-                            return i;
+                            if (cards[i].type != CardManagement.CardType.Finish)
+                            {
+                                if (cards[i].obj.transform.position.x <= screen_pos.x)
+                                    return i + 1;
+                                else
+                                    return i;
+                            }
                         }
                     }
                 }
@@ -105,9 +109,9 @@ public class MouseSystem : MonoBehaviour {
     // マウスカーソルとオブジェクトの当たり判定
     public bool Collider(GameObject obj)
     {
+        if (obj.activeSelf != true) return false;
         // カードボードのサイズ取得
         Vector2 halfSize = obj.GetComponent<RectTransform>().sizeDelta / 2;
-
         if (screen_pos.x >= obj.transform.position.x - halfSize.x &&
             screen_pos.x <= obj.transform.position.x + halfSize.x &&
             screen_pos.y >= obj.transform.position.y - halfSize.y &&
