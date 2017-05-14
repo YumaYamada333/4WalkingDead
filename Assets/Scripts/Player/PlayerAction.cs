@@ -441,6 +441,13 @@ public class PlayerAction : MonoBehaviour
             // 五秒後にゲームオーバー
             GameObject.Find("GameManager").GetComponent<ToResultScene>().ToOver(0);
         }
+        //壁
+        if (coll.gameObject.tag == "Block")
+        {
+            // 五秒後にゲームオーバー
+            GameObject.Find("GameManager").GetComponent<ToResultScene>().ToOver(2);
+        }
+
     }
 
     //----------------------------------------------------------------------
