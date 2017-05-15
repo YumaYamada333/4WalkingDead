@@ -5,7 +5,6 @@ using UnityEngine;
 public class Button : MonoBehaviour {
     // カメラ
     public GameObject mainCamera;
-    public GameObject otherCamera;
     // ボード  
     private GameObject ActionBord;
     private GameObject HandsBord;
@@ -22,6 +21,7 @@ public class Button : MonoBehaviour {
     [SerializeField]
     private GameObject ScrollRifhtButton;
 
+    private bool flag = true;
     //private float BordPosition_x;
     //private float BordPosition_y;
     //private float BordPosition_z;
@@ -44,7 +44,6 @@ public class Button : MonoBehaviour {
     // Use this for initialization
     void Awake ()
     {
-        otherCamera.SetActive(false);
         ActionBord = GameObject.Find("ActionBord");
         HandsBord = GameObject.Find("HandsBord");
         //RetuneButton = GameObject.Find("RetuneButton");
@@ -81,7 +80,7 @@ public class Button : MonoBehaviour {
     void Update ()
     {
         // actionboardの位置更新
-        if (mainCamera.activeSelf)
+        if (flag)
         {
             ActionBord.transform.localPosition = actPosActionBord/* + mainCamera.transform.position - firstPos*/;
         }
@@ -94,15 +93,13 @@ public class Button : MonoBehaviour {
 
         
 
-        if (mainCamera.activeSelf)
+        if (flag)
         {
             // カメラの切り替え　ボタンの配置
-
+            flag = false;
             //position_Flag = true;
-            mainCamera.SetActive(false);
             SpeedButton.SetActive(false);
             ExecutionButton.SetActive(false);
-            otherCamera.SetActive(true);
             //リセットボタン
             ResetButton.SetActive(true);
 
@@ -117,12 +114,11 @@ public class Button : MonoBehaviour {
         }
         else
         {
+            flag = true;
             // カメラの切り替え　ボタンの配置
             //position_Flag = false;
-            mainCamera.SetActive(true);
             SpeedButton.SetActive(true);
             ExecutionButton.SetActive(true);
-            otherCamera.SetActive(false);
             //リセットボタン
             ResetButton.SetActive(false);
 

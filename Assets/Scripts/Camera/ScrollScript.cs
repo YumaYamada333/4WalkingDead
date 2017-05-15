@@ -17,14 +17,14 @@ public class ScrollScript : MonoBehaviour
     void Start ()
     {
         //カメラの初期位置取得
-        CameraPos = GameObject.Find("Main Camera").transform.position;
+        CameraPos = GameObject.Find("MainCamera").transform.position;
     }
 
     // Update is called once per frame
     void Update ()
     {
         //カメラの現在位置取得
-        CameraTmp = GameObject.Find("Main Camera").transform.position;
+        CameraTmp = GameObject.Find("MainCamera").transform.position;
 
         //左クリック
         if (Input.GetMouseButton(0))
