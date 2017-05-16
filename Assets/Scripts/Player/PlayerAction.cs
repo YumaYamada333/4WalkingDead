@@ -303,16 +303,17 @@ public class PlayerAction : MonoBehaviour
                 //endPositionに到着
                 if (diff > time * 2)
                 {
-                    //animationを止めるフラグ
-                    animationFlag[animationFlagNum] = false;
-                    //アニメーションを止める
-                    animator.SetBool(animation, false);
-                    //カウントダウンフラグを立てる
+                    //MOVEならカウントダウンフラグを立てる
                     if (animationFlagNum == (int)ANIMATION.RUN)
                     {
                         GameObject card_manager = GameObject.Find("CardManager");
                         card_manager.GetComponent<CardManagement>().SetCountDownFlag(true);
                     }
+
+                    //animationを止めるフラグ
+                    animationFlag[animationFlagNum] = false;
+                    //アニメーションを止める
+                    animator.SetBool(animation, false);
                     //次の場所との差
                     endPosition += nextPosition;
                     particleCnt = 0;
@@ -436,6 +437,13 @@ public class PlayerAction : MonoBehaviour
             // 五秒後にゲームオーバー
             GameObject.Find("GameManager").GetComponent<ToResultScene>().ToOver(0);
         }
+        //壁
+        if (coll.gameObject.tag == "Block")
+        {
+            // 五秒後にゲームオーバー
+            GameObject.Find("GameManager").GetComponent<ToResultScene>().ToOver(2);
+        }
+
     }
 
     //----------------------------------------------------------------------
