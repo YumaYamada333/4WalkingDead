@@ -303,13 +303,18 @@ public class PlayerAction : MonoBehaviour
                 //endPositionに到着
                 if (diff > time * 2)
                 {
+                    //MOVEならカウントダウンフラグを立てる
+                    if (animationFlagNum == (int)ANIMATION.RUN)
+                    {
+                        GameObject card_manager = GameObject.Find("CardManager");
+                        card_manager.GetComponent<CardManagement>().SetCountDownFlag(true);
+                    }
+
                     //animationを止めるフラグ
                     animationFlag[animationFlagNum] = false;
                     //アニメーションを止める
                     animator.SetBool(animation, false);
-                    //カウントダウンフラグを立てる
-                    GameObject card_manager = GameObject.Find("CardManager");
-                    card_manager.GetComponent<CardManagement>().SetCountDownFlag(true);
+                   
                     //次の場所との差
                     endPosition += nextPosition;
                     particleCnt = 0;
