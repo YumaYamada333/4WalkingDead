@@ -74,7 +74,7 @@ public class GameManager : MonoBehaviour
                 //PlayrActionの情報を取得
                 PlayerAction player = playerAction.GetComponent<PlayerAction>();
                 //待機中なら
-                if (player.IsIdle() && !m_gimmick_move_flag)
+                if (player.IsIdle() && !GetGimmickFlag())
                 {
                     //プレイヤーがいることを確認
                     if (player != null)

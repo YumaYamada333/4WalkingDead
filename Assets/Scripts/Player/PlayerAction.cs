@@ -17,6 +17,8 @@ static class Constants
     public const int Attack = 1;        //attak
     public const int StageHeight = 2;  //ステージの高さ
     public const int RunPow = 2;       //走る距離
+    public const int OverTime = 2;     //ゲームオーバーまでの時間
+    public const int ClearTime = 3;    //クリアまでの時間
     public const int SuperAttack = 3;  //superattack
     public const int MaxEnemy = 4;     //敵の数
     public const int MaxJumpPow = 5;   //最大のジャンプ力
@@ -186,8 +188,6 @@ public class PlayerAction : MonoBehaviour
             Destroy(enemy[i]);
             //音を出す
             audioSource.PlayOneShot(Hit);
-            ////エフェクト再生
-            //EffekseerHandle e_damage = EffekseerSystem.PlayEffect("EnemyDamage", transform.position);
         }
     }
     //----------------------------------------------------------------------
@@ -308,8 +308,11 @@ public class PlayerAction : MonoBehaviour
                     //アニメーションを止める
                     animator.SetBool(animation, false);
                     //カウントダウンフラグを立てる
-                    GameObject card_manager = GameObject.Find("CardManager");
-                    card_manager.GetComponent<CardManagement>().SetCountDownFlag(true);
+                    if (animationFlagNum == (int)ANIMATION.RUN)
+                    {
+                        GameObject card_manager = GameObject.Find("CardManager");
+                        card_manager.GetComponent<CardManagement>().SetCountDownFlag(true);
+                    }
                     //次の場所との差
                     endPosition += nextPosition;
                     particleCnt = 0;
@@ -317,14 +320,6 @@ public class PlayerAction : MonoBehaviour
             }
 
         }
-        //テスト用
-        ////止める
-        //else if (animationFlag[animationFlagNum] == false)
-        //{
-        //    animator.SetBool(animation, false);
-
-        //}
-
     }
 
     //----------------------------------------------------------------------
@@ -394,7 +389,7 @@ public class PlayerAction : MonoBehaviour
                     animationNum = (int)ANIMATION.ATTACK;   //アニメーションの番号
                     animationName = "Over";                 //アニメーションの名前
                     // 五秒後にゲームオーバー
-                    GameObject.Find("GameManager").GetComponent<ToResultScene>().ToOver(2);
+                    GameObject.Find("GameManager").GetComponent<ToResultScene>().ToOver(Constants.OverTime);
 
                     break;
             }
@@ -420,7 +415,7 @@ public class PlayerAction : MonoBehaviour
             //EffekseerHandle p_damage = EffekseerSystem.PlayEffect("PlayerDamage", transform.position);
 
             // 五秒後にゲームオーバー
-            GameObject.Find("GameManager").GetComponent<ToResultScene>().ToOver(2, ToResultScene.OverType.FALL);
+            GameObject.Find("GameManager").GetComponent<ToResultScene>().ToOver(Constants.OverTime, ToResultScene.OverType.FALL);
         }
         else
         {
@@ -429,10 +424,10 @@ public class PlayerAction : MonoBehaviour
         }
 
         //トゲ
-        if (coll.gameObject.tag == "Thorn")
+        if (coll.gameObject.tag == "Thorn" || coll.gameObject.tag == "Block")
         {
             // 五秒後にゲームオーバー
-            GameObject.Find("GameManager").GetComponent<ToResultScene>().ToOver(2);
+            GameObject.Find("GameManager").GetComponent<ToResultScene>().ToOver(Constants.OverTime);
         }
 
         //落下限界
@@ -456,14 +451,8 @@ public class PlayerAction : MonoBehaviour
         if (hit.gameObject.tag == "Goal")
         {
             // 五秒後にクリア
-            GameObject.Find("GameManager").GetComponent<ToResultScene>().ToClear(3);
+            GameObject.Find("GameManager").GetComponent<ToResultScene>().ToClear(Constants.ClearTime);
         }
-        ////トゲ
-        //if (hit.gameObject.tag == "Thorn")
-        //{
-        //    // 五秒後にゲームオーバー
-        //    GameObject.Find("GameManager").GetComponent<ToResultScene>().ToOver(2);
-        //}
         //地面
         if (!isGround)
         {
@@ -473,9 +462,6 @@ public class PlayerAction : MonoBehaviour
                 //middlePosを超えたら
                 if (diff > time)
                 {
-                    ////エフェクトの再生
-                    //EffekseerHandle jump = EffekseerSystem.PlayEffect("Landing", transform.position);
-
                     //パーティクルの再生
                     particleCnt = 4;
                 }
