@@ -85,7 +85,13 @@ public class Button : MonoBehaviour {
             ActionBord.transform.localPosition = actPosActionBord/* + mainCamera.transform.position - firstPos*/;
         }
         CardBord board = ActionBord.GetComponent<CardBord>();
-        
+
+        if (board.CheckLeftEnd()) ScrollRifhtButton.SetActive(false);
+        else ScrollRifhtButton.SetActive(true);
+
+        if (board.CheckRightEnd()) ScrollLeftButton.SetActive(false);
+        else ScrollLeftButton.SetActive(true);
+
     }
 
     public void OnClick()
