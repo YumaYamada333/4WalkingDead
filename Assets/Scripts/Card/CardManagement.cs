@@ -16,6 +16,7 @@ public class CardManagement : MonoBehaviour {
     Vector2 actionBordSize;
 
     // カード
+    public GameObject startCard;
     public GameObject moveCard;
     public GameObject jumpCard;
     public GameObject attackCard;
@@ -37,6 +38,7 @@ public class CardManagement : MonoBehaviour {
     // カードの種類
     public enum CardType
     {
+        Start,
         Move,
         Jump,
         Attack,
@@ -164,6 +166,7 @@ public class CardManagement : MonoBehaviour {
 
         // ステージの仮のmoveカード配置
         CardBord bord = actionBord.GetComponent<CardBord>();
+        bord.SetCard(Instantiate(startCard), CardType.Start);
         bord.SetCard(Instantiate(moveCard), CardType.Move);
         bord.SetCard(Instantiate(moveCard), CardType.Move);
         bord.SetCard(Instantiate(moveCard), CardType.Move);
@@ -346,6 +349,9 @@ public class CardManagement : MonoBehaviour {
         {
             switch (card.type)
             {
+                case CardType.Start:
+                    card.obj = Instantiate(startCard);
+                    break;
                 case CardType.Move:
                     card.obj = Instantiate(moveCard);
                     break;
@@ -486,6 +492,9 @@ public class CardManagement : MonoBehaviour {
         {
             switch (data.setCard[i].type)
             {
+                case CardType.Start:
+                    bord.SetCard(Instantiate(startCard), data.setCard[i].type);
+                    break;
                 case CardType.Move:
                     bord.SetCard(Instantiate(moveCard), data.setCard[i].type);
                     break;

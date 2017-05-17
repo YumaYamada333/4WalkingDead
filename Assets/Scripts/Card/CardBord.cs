@@ -234,10 +234,10 @@ public class CardBord : MonoBehaviour {
             for (int i = usingCard; i < numSetMax; i++)
             {
                 if (cards[i].obj == null) continue;
-                if (cards[i].obj.transform.position.x + cardSize.x>= 
-                    transform.position.x + GetComponent<RectTransform>().sizeDelta.x / 2 ||
-                    cards[i].obj.transform.position.x - cardSize.x <=
-                    transform.position.x - GetComponent<RectTransform>().sizeDelta.x / 2)
+                if (cards[i].obj.transform.localPosition.x >= 
+                    transform.localPosition.x + GetComponent<RectTransform>().sizeDelta.x / 2 ||
+                    cards[i].obj.transform.localPosition.x <=
+                    transform.localPosition.x - GetComponent<RectTransform>().sizeDelta.x / 2)
                 {
                     cards[i].obj.SetActive(false);
                 }
@@ -248,6 +248,32 @@ public class CardBord : MonoBehaviour {
             }
         }
     }
+    public bool CheckRightEnd()
+    {
+        if (cards[numSet - 1].obj == null) return false;
+        if (numSet < GetComponent<RectTransform>().sizeDelta.x / cardSize.x + 1||
+            (cards[numSet - 1].obj.transform.localPosition.x + cardSize.x >=
+            transform.localPosition.x + GetComponent<RectTransform>().sizeDelta.x / 2 &&
+            cards[numSet - 1].obj.activeSelf))
+            {
+                return true;
+            }
+        return false;
+    }
+
+    public bool CheckLeftEnd()
+    {
+        if (cards[usingCard].obj == null) return false;
+        if (numSet < GetComponent<RectTransform>().sizeDelta.x / cardSize.x + 1||
+            (cards[usingCard].obj.transform.localPosition.x - cardSize.x <=
+            transform.localPosition.x - GetComponent<RectTransform>().sizeDelta.x / 2 &&
+            cards[usingCard].obj.activeSelf))
+        {
+            return true;
+        }
+        return false;
+    }
+
 
     // ボードにカードをセットする
     public bool SetCard(GameObject obj, CardManagement.CardType type)
