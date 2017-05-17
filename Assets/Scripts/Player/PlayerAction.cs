@@ -17,8 +17,6 @@ static class Constants
     public const int Attack = 1;        //attak
     public const int StageHeight = 2;  //ステージの高さ
     public const int RunPow = 2;       //走る距離
-    public const int OverTime = 2;     //ゲームオーバーまでの時間
-    public const int ClearTime = 3;    //クリアまでの時間
     public const int SuperAttack = 3;  //superattack
     public const int MaxEnemy = 4;     //敵の数
     public const int MaxJumpPow = 5;   //最大のジャンプ力
@@ -63,8 +61,14 @@ public class PlayerAction : MonoBehaviour
     public AudioClip Hit;
     public AudioClip Move;
 
-    //パーティクルカウント
-    public int particleCnt = 0;
+    //パーティクルの種類
+    const int NONE = 0;
+    const int MOVE = 1;
+    const int ATTACK = 2;
+    const int DAMAGE = 3;
+    const int LANDING = 4;
+    //パーティカルの種類判別用
+    public int particleType;
 
     void OnEnable() //objが生きている場合
     {
@@ -188,6 +192,8 @@ public class PlayerAction : MonoBehaviour
             Destroy(enemy[i]);
             //音を出す
             audioSource.PlayOneShot(Hit);
+            ////エフェクト再生
+            //EffekseerHandle e_damage = EffekseerSystem.PlayEffect("EnemyDamage", transform.position);
         }
     }
     //----------------------------------------------------------------------
@@ -303,24 +309,28 @@ public class PlayerAction : MonoBehaviour
                 //endPositionに到着
                 if (diff > time * 2)
                 {
-                    //MOVEならカウントダウンフラグを立てる
-                    if (animationFlagNum == (int)ANIMATION.RUN)
-                    {
-                        GameObject card_manager = GameObject.Find("CardManager");
-                        card_manager.GetComponent<CardManagement>().SetCountDownFlag(true);
-                    }
-
                     //animationを止めるフラグ
                     animationFlag[animationFlagNum] = false;
                     //アニメーションを止める
                     animator.SetBool(animation, false);
+                    //カウントダウンフラグを立てる
+                    GameObject card_manager = GameObject.Find("CardManager");
+                    card_manager.GetComponent<CardManagement>().SetCountDownFlag(true);
                     //次の場所との差
                     endPosition += nextPosition;
-                    particleCnt = 0;
+                    particleType = NONE;        //パーティカルの種類決定
                 }
             }
 
         }
+        //テスト用
+        ////止める
+        //else if (animationFlag[animationFlagNum] == false)
+        //{
+        //    animator.SetBool(animation, false);
+
+        //}
+
     }
 
     //----------------------------------------------------------------------
@@ -344,7 +354,7 @@ public class PlayerAction : MonoBehaviour
                     animationNum = (int)ANIMATION.RUN;  //アニメーションの番号
                     animationName = "Run";              //アニメーションの名前
                     //EffekseerHandle run = EffekseerSystem.PlayEffect("smoke", transform.position);  //エフェクト再生
-                    particleCnt = 1;               //パーティクルの再生
+                    particleType = MOVE;               //パーティクルの種類決定
                     break;
                 //jump
                 case CardManagement.CardType.Jump:
@@ -352,7 +362,7 @@ public class PlayerAction : MonoBehaviour
                     cardSetFlag = true;                 //カードセットフラグ
                     animationNum = (int)ANIMATION.JUMP; //アニメーションの番号
                     animationName = "Jump";             //アニメーションの名前
-                    particleCnt = 0;
+                    particleType = NONE;        //パーティカルの種類決定
                     break;
                 //attack
                 case CardManagement.CardType.Attack:
@@ -361,7 +371,7 @@ public class PlayerAction : MonoBehaviour
                     animationNum = (int)ANIMATION.ATTACK;   //アニメーションの番号
                     animationName = "Attack";               //アニメーションの名前
                     //EffekseerHandle attack = EffekseerSystem.PlayEffect("attake", transform.position);
-                    particleCnt = 2;                 //パーティクルの再生
+                    particleType = ATTACK;        //パーティカルの種類決定
                     break;
 
                 // スーパーシリーズ //
@@ -390,7 +400,7 @@ public class PlayerAction : MonoBehaviour
                     animationNum = (int)ANIMATION.ATTACK;   //アニメーションの番号
                     animationName = "Over";                 //アニメーションの名前
                     // 五秒後にゲームオーバー
-                    GameObject.Find("GameManager").GetComponent<ToResultScene>().ToOver(Constants.OverTime);
+                    GameObject.Find("GameManager").GetComponent<ToResultScene>().ToOver(2);
 
                     break;
             }
@@ -409,26 +419,24 @@ public class PlayerAction : MonoBehaviour
         //プレイヤーと敵が当たったら
         if (coll.gameObject.tag == "Enemy")
         {
-            //パーティクルの再生
-            particleCnt = 3;
+            particleType = DAMAGE;        //パーティカルの種類決定
 
             //////エフェクト再生
             //EffekseerHandle p_damage = EffekseerSystem.PlayEffect("PlayerDamage", transform.position);
 
             // 五秒後にゲームオーバー
-            GameObject.Find("GameManager").GetComponent<ToResultScene>().ToOver(Constants.OverTime, ToResultScene.OverType.FALL);
+            GameObject.Find("GameManager").GetComponent<ToResultScene>().ToOver(2, ToResultScene.OverType.FALL);
         }
         else
         {
-            //パーティクルの停止
-            particleCnt = 0;
+            particleType = NONE;        //パーティカルの種類決定
         }
 
         //トゲ
-        if (coll.gameObject.tag == "Thorn" || coll.gameObject.tag == "Block")
+        if (coll.gameObject.tag == "Thorn")
         {
             // 五秒後にゲームオーバー
-            GameObject.Find("GameManager").GetComponent<ToResultScene>().ToOver(Constants.OverTime);
+            GameObject.Find("GameManager").GetComponent<ToResultScene>().ToOver(2);
         }
 
         //落下限界
@@ -437,13 +445,6 @@ public class PlayerAction : MonoBehaviour
             // 五秒後にゲームオーバー
             GameObject.Find("GameManager").GetComponent<ToResultScene>().ToOver(0);
         }
-        //壁
-        if (coll.gameObject.tag == "Block")
-        {
-            // 五秒後にゲームオーバー
-            GameObject.Find("GameManager").GetComponent<ToResultScene>().ToOver(2);
-        }
-
     }
 
     //----------------------------------------------------------------------
@@ -459,8 +460,14 @@ public class PlayerAction : MonoBehaviour
         if (hit.gameObject.tag == "Goal")
         {
             // 五秒後にクリア
-            GameObject.Find("GameManager").GetComponent<ToResultScene>().ToClear(Constants.ClearTime);
+            GameObject.Find("GameManager").GetComponent<ToResultScene>().ToClear(3);
         }
+        ////トゲ
+        //if (hit.gameObject.tag == "Thorn")
+        //{
+        //    // 五秒後にゲームオーバー
+        //    GameObject.Find("GameManager").GetComponent<ToResultScene>().ToOver(2);
+        //}
         //地面
         if (!isGround)
         {
@@ -470,13 +477,14 @@ public class PlayerAction : MonoBehaviour
                 //middlePosを超えたら
                 if (diff > time)
                 {
-                    //パーティクルの再生
-                    particleCnt = 4;
+                    ////エフェクトの再生
+                    //EffekseerHandle jump = EffekseerSystem.PlayEffect("Landing", transform.position);
+
+                    particleType = LANDING;        //パーティカルの種類決定
                 }
                 else
                 {
-                    //パーティクルの停止
-                    particleCnt = 0;
+                    particleType = NONE;        //パーティカルの種類決定
                 }
             }
         }
