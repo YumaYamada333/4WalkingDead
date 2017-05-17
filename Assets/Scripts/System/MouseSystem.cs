@@ -7,6 +7,9 @@ public class MouseSystem : MonoBehaviour {
     Vector3 screen_pos;    //マウスのスクリーン座標
     Vector3 world_pos;     //マウスのワールド座標
 
+    Vector2 touchPos;      // タッチ位置
+    Vector2 dragVec;      // 移動ベクトル
+
     // Use this for initialization
     void Start ()
     {
@@ -25,6 +28,27 @@ public class MouseSystem : MonoBehaviour {
         world_pos = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<Camera>().ScreenToWorldPoint(screen_pos);
         //Debug.Log(world_pos);
 
+        // タッチ位置の保存
+        if (Input.GetMouseButtonDown(0))
+        {
+            touchPos = screen_pos;
+        }
+
+        // ドラッグ中
+        if (Input.GetMouseButton(0))
+        {
+            dragVec = new Vector3(screen_pos.x - touchPos.x, screen_pos.y - touchPos.y);
+        }
+        else dragVec = Vector2.zero;
+
+    }
+    public Vector2 GetDragVec()
+    {
+        return dragVec;
+    }
+    public Vector2 GetTouchPos()
+    {
+        return touchPos;
     }
 
     public RaycastHit GetReyhitObject()

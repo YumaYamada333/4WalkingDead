@@ -50,6 +50,9 @@ public class CardBord : MonoBehaviour {
     // マウスのコンポーネント
     MouseSystem mouse_system;
 
+    // マウスのクリック時の座標
+    float dragPos;
+    
     //実行フラグ
     bool PlayFlag = false;
 
@@ -247,6 +250,8 @@ public class CardBord : MonoBehaviour {
                 }
             }
         }
+
+        Scroll();
     }
     public bool CheckRightEnd()
     {
@@ -328,6 +333,37 @@ public class CardBord : MonoBehaviour {
         cards[posNo].type = card.type;
         numSet++;
         return true;
+    }
+
+    void Scroll()
+    {
+        if (Input.GetMouseButton(0))
+        {
+            int num = (int)((mouse_system.GetDragVec().x - dragPos) / cardSize.x);
+            if (num != 0)
+            {
+                dragPos = mouse_system.GetDragVec().x;
+
+                if (num > 0)
+                {
+                    for (int i = 0; i < num; i++)
+                    {
+                        if (CheckLeftEnd()) break;
+                        ScrollToRight();
+                    }
+
+                }
+                else if (num < 0)
+                {
+                    for (int i = 0; i < -num; i++)
+                    {
+                        if (CheckRightEnd()) break;
+                        ScrollToLeft();
+                    }
+
+                }
+            }
+        }
     }
 
     public void ScrollToLeft()
