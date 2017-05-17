@@ -71,7 +71,7 @@ public class CardManagement : MonoBehaviour {
     // 選択中のカード
     int selectedCard;
     // 挟むカードデータを保持
-    CardData tuckCard;
+    public CardData tuckCard;
 
     // カーソルのフォーカス
     public enum CursorForcusTag
@@ -95,6 +95,9 @@ public class CardManagement : MonoBehaviour {
 
     // カウントダウン判定フラグ
     private bool countDownFlag = false;
+
+    //カード掴み判定フラグ
+    bool gripFlag;
 
     //初期所持カード判断ステージ番号
     //public int stageNum;
@@ -169,10 +172,14 @@ public class CardManagement : MonoBehaviour {
 
         // MouseSystemコンポーネントの取得
         mouse_system = GameObject.Find("MouseSystem").GetComponent<MouseSystem>();
+
+        gripFlag = false;
     }
 
     // Update is called once per frame
     void Update () {
+        //つかむ判定を初期地に戻す
+        gripFlag = false;
 
         // データの更新
         if (isUpdateData) UpdateData();
@@ -255,6 +262,9 @@ public class CardManagement : MonoBehaviour {
                 selectedCard = mouse_system.GetMouseHit(handsBord);
                 if (selectedCard >= 0)
                 {
+                    //つかむ判定を立てる
+                    gripFlag = true;
+
                     tuckCard = cards[selectedCard];
                     cursor = CursorForcusTag.ActtionBord;
                     actionBord.GetComponent<CardBord>().selectedSpace = -1;
@@ -270,8 +280,12 @@ public class CardManagement : MonoBehaviour {
             // 左クリックしてる
             if (Input.GetMouseButton(0))
             {
+                //つかむ判定を立てる
+                gripFlag = true;
+
                 // カードを移動
                 tuckCard.front.obj.transform.position = mouse_system.GetScreenPos();
+
             }
             // してない
             else
@@ -493,6 +507,12 @@ public class CardManagement : MonoBehaviour {
         //// カード所持数を戻す
         //for (int i = 0; i < cards.Length; i++)
         //    cards[i].numHold = data.cardNum[i];
+    }
+
+    //つかみ判定取得関数
+    public bool GetGripFlag()
+    {
+        return gripFlag;
     }
 
 }
