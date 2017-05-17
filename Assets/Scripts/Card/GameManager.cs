@@ -23,6 +23,10 @@ public class GameManager : MonoBehaviour
     [SerializeField]
     bool m_gimmick_move_flag = false;
 
+    private bool m_oldGimmickMoveFlag = true;
+    // カメラのコントローラー
+    CameraControl m_camera;
+
     // ゲームの状態
     public enum GameState
     {
@@ -38,6 +42,7 @@ public class GameManager : MonoBehaviour
     {
         gameState = GameState.SetCard;
         playerAction = GameObject.Find("unitychan");
+        m_camera = GameObject.Find("MainCamera").GetComponent<CameraControl>();
     }
 
     // Update is called once per frame
@@ -86,7 +91,19 @@ public class GameManager : MonoBehaviour
                     //cardManage.ActtionCard(false);
                     cardTime = 0.0f;
                 }
+
+                // カメラの制御
+                if (m_oldGimmickMoveFlag != GetGimmickFlag() && !m_camera.GetCameraMove())
+                {
+                    if (GetGimmickFlag())
+                        m_camera.ResetCamera(0.5f);
+                    else
+                        m_camera.SetFocusObject(playerAction, new Vector3(0, 1, -10), true, 0.5f);
+
+                    m_oldGimmickMoveFlag = m_gimmick_move_flag;
+                }
                 break;
+
         }
 
     }

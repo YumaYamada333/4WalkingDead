@@ -4,6 +4,12 @@ using UnityEngine;
 
 public class CameraControl : MonoBehaviour {
 
+    // 注目するオブジェクト
+    private GameObject m_focusObject = null;
+
+    // 注目点のずれ
+    private Vector3 m_focusPos = Vector3.zero;
+
     // カメラの初期位置保存
     private Vector3 m_defaultPos = Vector3.zero; 
 
@@ -16,7 +22,10 @@ public class CameraControl : MonoBehaviour {
 
     // ズーム時間
     private float m_moveTime = 0.0f;
-         
+
+    // オブジェクトを追尾するかどうか
+    private bool m_follow = false;
+
     // ラープ中フラグ
     private bool m_init = false;
 
@@ -48,21 +57,33 @@ public class CameraControl : MonoBehaviour {
             float timeStep = (Time.time - m_time) / m_moveTime;
             if (timeStep <= 1)
                 this.transform.position = Lerp(m_startPosition, m_targetPosition, timeStep);
-        }            
+        }
+
+        // カメラの追尾
+        if (!GetCameraMove() && m_follow && m_init)
+            this.transform.position = m_focusObject.transform.position + m_focusPos;
+        else if (GetCameraMove() && m_follow && m_init)
+            m_targetPosition = m_focusObject.transform.position + m_focusPos;
     }
 
     // 注目するオブジェクトを変更(カメラのずれを設定)
-    public void SetFocusObject(GameObject obj, Vector3 pos, float moveTime = 0.0f)
+    public void SetFocusObject(GameObject obj, Vector3 pos, bool follow = false, float moveTime = 0.0f)
     {
+        m_focusObject = obj;
+        m_focusPos = pos;
         m_targetPosition = obj.transform.position + pos;
+        m_follow = follow;
         m_moveTime = moveTime;
         m_init = false;
     }
 
     // 注目するオブジェクトを変更(奥行きz指定)
-    public void SetFocusObject(GameObject obj, float posZ, float moveTime = 0.0f)
+    public void SetFocusObject(GameObject obj, float posZ, bool follow = false, float moveTime = 0.0f)
     {
+        m_focusObject = obj;
+        m_focusPos = new Vector3(0.0f, 0.0f, posZ);
         m_targetPosition = obj.transform.position + new Vector3(0.0f, 0.0f, posZ);
+        m_follow = follow;
         m_moveTime = moveTime;
         m_init = false;
     }
@@ -73,6 +94,7 @@ public class CameraControl : MonoBehaviour {
         m_targetPosition = pos;
         m_moveTime = moveTime;
         m_init = false;
+        m_follow = false;
     }
 
     // ズームイン・アウト(x,y,z指定)
@@ -97,6 +119,7 @@ public class CameraControl : MonoBehaviour {
         m_targetPosition = m_defaultPos;
         m_moveTime = moveTime;
         m_init = false;
+        m_follow = false;
     }
 
     // カメラが移動中かどうか取得
@@ -104,6 +127,12 @@ public class CameraControl : MonoBehaviour {
     {
         float timeStep = (Time.time - m_time) / m_moveTime;
         return timeStep <= 1;
+    }
+
+    // オブジェクトを追尾させるか
+    public void SetFollow(bool follow)
+    {
+        m_follow = follow;
     }
 
     // 値の比較
