@@ -26,6 +26,7 @@ public class ParticaleScript : MonoBehaviour
     //プレイヤー取得用
     GameObject player;
     PlayerAction act;
+
     //アクションブロック取得用
     //GameObject block;
     //ActionCountDown actDown;
@@ -33,13 +34,15 @@ public class ParticaleScript : MonoBehaviour
     //BlockMove blockAct;
 
     // Use this for initialization
-    void Start ()
+    void Start()
     {
         //コンポーネントの取得
         particle = GetComponent<ParticleSystem>();
 
+        //プレイヤーの取得
         player = GameObject.Find("unitychan");
         act = player.GetComponent<PlayerAction>();
+
         //block = GameObject.Find("Block");
         //actDown = block.GetComponent<ActionCountDown>();
         //blockAction = block.GetComponent<BlockAction>() as BlockAction;
@@ -53,11 +56,22 @@ public class ParticaleScript : MonoBehaviour
     void Update()
     {
         //プレイヤーのアクションを判別
-        particleCnt = act.particleCnt;
+        particleCnt = act.particleType;
+
         //BlockPartical = actDown.GetActionType();
         //flag = blockAct.GetFlag();
 
-        //アクションの種類によってパーティカルを発生
+        //プレイヤーのパーティカルを発生
+        PlayerParticle(particleCnt);
+
+        ////ギミックのパーティカルを発生
+        //GimmickParticle(int ParticleType)
+    }
+
+    //アクションの種類によってパーティカルを発生させる関数
+    void PlayerParticle(int ParticleType)
+    {
+        //プレイヤーのアクションの種類によって発生させるパーティクルを決定
         switch (particleCnt)
         {
             case NONE:
@@ -104,24 +118,27 @@ public class ParticaleScript : MonoBehaviour
                 }
                 break;
         }
-
-        ////アクションの種類によってパーティカルを発生
-        //switch (BlockPartical)
-        //{
-        //    case GIMMICK:
-        //        if ((particle.name == "GimmickParticle" || particle.name == "GimmickParticle (1)") && flag == true)
-        //        {
-        //            particle.Play();
-        //        }
-        //        break;
-        //    //case BREAK:
-        //    //    if (particle.name == "BreakParticle" && flag == true)
-        //    //    {
-        //    //        particle.Play();
-        //    //    }
-        //    //    break;
-        //}
-
     }
 
+    ////ギミックの種類によってパーティクルを発生させる関数
+    //void GimmickParticle(int ParticleType)
+    //{
+    //    //ギミックの種類によって発生させるパーティクルを決定
+    //    switch (BlockPartical)
+    //    {
+    //        case GIMMICK:
+    //            if ((particle.name == "GimmickParticle" || particle.name == "GimmickParticle (1)") && flag == true)
+    //            {
+    //                particle.Play();
+    //            }
+    //            break;
+    //            //case BREAK:
+    //            //    if (particle.name == "BreakParticle" && flag == true)
+    //            //    {
+    //            //        particle.Play();
+    //            //    }
+    //            //    break;
+    //    }
+
+    //}
 }
