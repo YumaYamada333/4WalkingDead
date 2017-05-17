@@ -52,6 +52,8 @@ public class CardBord : MonoBehaviour {
 
     // マウスのクリック時の座標
     float dragPos;
+
+    bool canScroll;
     
     //実行フラグ
     bool PlayFlag = false;
@@ -337,7 +339,11 @@ public class CardBord : MonoBehaviour {
 
     void Scroll()
     {
-        if (Input.GetMouseButton(0))
+        if (Input.GetMouseButtonDown(0) && mouse_system.Collider(gameObject)) canScroll = true;
+        else if (Input.GetMouseButtonUp(0)) canScroll = false; 
+
+
+        if (Input.GetMouseButton(0) && canScroll)
         {
             int num = (int)((mouse_system.GetDragVec().x - dragPos) / cardSize.x);
             if (num != 0)
