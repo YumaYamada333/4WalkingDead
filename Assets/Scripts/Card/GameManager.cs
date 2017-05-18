@@ -79,7 +79,7 @@ public class GameManager : MonoBehaviour
                 //PlayrActionの情報を取得
                 PlayerAction player = playerAction.GetComponent<PlayerAction>();
                 //待機中なら
-                if (player.IsIdle() && !GetGimmickFlag() && !cardManage.GetCountDownFlag())
+                if (player.IsIdle() && !GetGimmickFlag()&& CountDown.GetCountDown()== CountDown.CountType.Nothing)
                 {
                     //プレイヤーがいることを確認
                     if (player != null)

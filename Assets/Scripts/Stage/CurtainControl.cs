@@ -23,10 +23,13 @@ public class CurtainControl : MonoBehaviour
     private GameObject right_curtain;
 
     /*秒数*/
-    public float time;
+    float time;
 
     /*カーテンカウント*/
     float curtain_cnt;
+
+    //カーテンの状態
+    int CurtainState = -1;
 
 	// Use this for initialization
 	void Start ()
@@ -41,14 +44,34 @@ public class CurtainControl : MonoBehaviour
 	// Update is called once per frame
 	void Update ()
     {
-        /*curtain_cntがtime以上なら*/
-		if(time<curtain_cnt)
+        if (CurtainState == 1) 
         {
-            /*関数呼び出し*/
-            curtainIn();
+            /*カーテンをだんだん表示(閉じる)*/
+            this.left_curtain.GetComponent<Image>().fillAmount += 0.01f;
+            this.right_curtain.GetComponent<Image>().fillAmount += 0.01f;
+            curtain_cnt++;
+            if (time <= curtain_cnt) 
+            {
+                CurtainState = 0;
+                curtain_cnt = 0;
+            }
         }
-        /*カウントを足す*/
-        curtain_cnt++;
+        if (CurtainState == -1)
+        {
+            this.left_curtain.GetComponent<Image>().fillAmount -= 0.01f;
+            this.right_curtain.GetComponent<Image>().fillAmount -= 0.01f;
+            curtain_cnt++;
+            /*カーテンをだんだん消す(開く)*/
+            if (time <= curtain_cnt)
+            {
+                CurtainState = 0;
+                curtain_cnt = 0;
+            }
+        }
+        else
+        {
+
+        }
     }
     //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_
     //! @brief カーテンを開く関数
@@ -58,11 +81,9 @@ public class CurtainControl : MonoBehaviour
     //! @return なし
     //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_
 
-    void curtainIn()
+    public void curtainIn()
     {
-        /*表示を段々と消していく*/
-        this.left_curtain.GetComponent<Image>().fillAmount -= 0.01f;
-        this.right_curtain.GetComponent<Image>().fillAmount -= 0.01f;
+        CurtainState = -1;
     }
 
     //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_
@@ -74,8 +95,6 @@ public class CurtainControl : MonoBehaviour
     //_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_
     public void curtainOut()
     {
-        /*表示を段々としていく*/
-        this.left_curtain.GetComponent<Image>().fillAmount += 0.01f;
-        this.right_curtain.GetComponent<Image>().fillAmount += 0.01f;
+        CurtainState = 1;
     }
 }

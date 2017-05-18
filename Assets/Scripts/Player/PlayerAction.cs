@@ -55,6 +55,45 @@ public class PlayerAction : MonoBehaviour
     private Animator animator;        //アニメーター
     private CharacterController controller;  //charactercontroller
 
+    //Resultを動かすためのフラグ
+    public bool ClearFlag = false;
+    public bool OverFlag = false;
+
+    // クリアコンポーネント
+    public GameObject T_GameClear;
+    // オーバーコンポーネント
+    public GameObject T_GameOver;
+
+    private GameObject GameOver;
+
+    //ゲーム終了時に表示するボタン
+    public GameObject TitleButton;
+    public GameObject SelectButton;
+    //ボードを消す
+    public GameObject CanvasBord;
+    public GameObject CanvasSpeedButton;
+    public GameObject CanvasResetButton;
+    public GameObject CanvasSetButton;
+    public GameObject CanvasPlayButton;
+
+    //カメラのポジション
+    Vector3 CameraPos;
+
+    //下降する座標
+    private float FallPos = 8.0f;
+
+    //下降する値
+    private float FallNum = 0.05f;
+
+    //ループする回数
+    private int RoopCnt = 10;
+
+    //下降する座標(y座標)
+    private float FallPosY;
+
+    //下降する座標(z座標)
+    private float FallPosZ = 1;
+
     //音
     public AudioClip Attack;
     public AudioClip Jump;
@@ -112,6 +151,12 @@ public class PlayerAction : MonoBehaviour
 
 
         //}
+
+        //カメラのポジション
+        CameraPos = GameObject.FindGameObjectWithTag("MainCamera").transform.position;
+        //OverPosに代入
+        FallPosY = CameraPos.y / 2 + 10;
+
         //走っている場合
         if (animationFlag[(int)ANIMATION.RUN])
         {
@@ -172,6 +217,13 @@ public class PlayerAction : MonoBehaviour
         {
             isGround = false;
         }
+
+        //ClearFlagがtrueだったら
+        ClearControl();
+
+        //OverFlagがtrueだったら
+        OverControl();
+
     }
 
     //----------------------------------------------------------------------
@@ -314,8 +366,8 @@ public class PlayerAction : MonoBehaviour
                     //アニメーションを止める
                     animator.SetBool(animation, false);
                     //カウントダウンフラグを立てる
-                    GameObject card_manager = GameObject.Find("CardManager");
-                    card_manager.GetComponent<CardManagement>().SetCountDownFlag(true);
+                    CardBord board = GameObject.Find("ActionBord").GetComponent<CardBord>();
+                    CountDown.SetCountDown(board.GetCardType(board.usingCard - 1));
                     //次の場所との差
                     endPosition += nextPosition;
                     particleType = NONE;        //パーティカルの種類決定
@@ -401,6 +453,17 @@ public class PlayerAction : MonoBehaviour
                     animationName = "Over";                 //アニメーションの名前
                     // 五秒後にゲームオーバー
                     GameObject.Find("GameManager").GetComponent<ToResultScene>().ToOver(2);
+                    if (GameOver == null)
+                    {
+                        //プレイヤーのアクションを止める
+                        AnimationStop();
+                        //"Over"を生成
+                        GameOver = Instantiate(T_GameOver);
+                        //Overを画面外にセット
+                        GameOver.transform.position = new Vector3(CameraPos.x, FallPosY, FallPosZ);
+                        //Overの文字を移動するためのフラグをonに
+                        OverFlag = true;
+                    }
 
                     break;
             }
@@ -423,27 +486,74 @@ public class PlayerAction : MonoBehaviour
 
             //////エフェクト再生
             //EffekseerHandle p_damage = EffekseerSystem.PlayEffect("PlayerDamage", transform.position);
+            if (GameOver == null)
+            {
+                //カードボードなどの操作系を消す
+                Invoke("SetCanvasActive", 0);
 
-            // 五秒後にゲームオーバー
-            GameObject.Find("GameManager").GetComponent<ToResultScene>().ToOver(2, ToResultScene.OverType.FALL);
+                //プレイヤーのアクションを止める
+                AnimationStop();
+                //"Over"を生成
+                GameOver = Instantiate(T_GameOver);
+                //Overを画面外にセット
+                GameOver.transform.position = new Vector3(CameraPos.x, FallPosY, FallPosZ);
+                //Overの文字を移動するためのフラグをonに
+                OverFlag = true;
+            }
         }
         else
         {
             particleType = NONE;        //パーティカルの種類決定
         }
+        //プレイヤーがゴールについたら
+        if (coll.gameObject.tag == "Goal")
+        {
+            //カードボードなどの操作系を消す
+            Invoke("SetCanvasActive", 0);
+            //プレイヤーのアクションを止める
+            AnimationStop();
+            //"CLEAR"を生成
+            T_GameClear = Instantiate(T_GameClear);
+            //CLEARを画面外にセット
+            T_GameClear.transform.position = new Vector3(CameraPos.x, FallPosY, FallPosZ);
+            //CLEARの文字を移動するためのフラグをonに
+            ClearFlag = true;
+        }
 
         //トゲ
         if (coll.gameObject.tag == "Thorn")
         {
-            // 五秒後にゲームオーバー
-            GameObject.Find("GameManager").GetComponent<ToResultScene>().ToOver(2);
+            if (GameOver == null)
+            {
+                //カードボードなどの操作系を消す
+                Invoke("SetCanvasActive", 0);
+                //プレイヤーのアクションを止める
+                AnimationStop();
+                //"Over"を生成
+                GameOver = Instantiate(T_GameOver);
+                //Overを画面外にセット
+                GameOver.transform.position = new Vector3(CameraPos.x, FallPosY, FallPosZ);
+                //Overの文字を移動するためのフラグをonに
+                OverFlag = true;
+            }
         }
 
         //落下限界
         if (coll.gameObject.tag == "GameOverZone")
         {
-            // 五秒後にゲームオーバー
-            GameObject.Find("GameManager").GetComponent<ToResultScene>().ToOver(0);
+            if (GameOver == null)
+            {
+                //カードボードなどの操作系を消す
+                Invoke("SetCanvasActive", 0);
+                //プレイヤーのアクションを止める
+                AnimationStop();
+                //"Over"を生成
+                GameOver = Instantiate(T_GameOver);
+                //Overを画面外にセット
+                GameOver.transform.position = new Vector3(CameraPos.x, FallPosY, FallPosZ);
+                //Overの文字を移動するためのフラグをonに
+                OverFlag = true;
+            }
         }
     }
 
@@ -539,6 +649,101 @@ public class PlayerAction : MonoBehaviour
     public void AnimationStop()
     {
         animator.SetBool(animationName, false);
+    }
+    //----------------------------------------------------------------------
+    //! @brief ボタンの表示
+    //!
+    //! @param[in] なし
+    //!
+    //! @return なし
+    //----------------------------------------------------------------------
+    public void SetButtonOn()
+    {
+        TitleButton.SetActive(true);
+        SelectButton.SetActive(true);
+    }
+
+    //----------------------------------------------------------------------
+    //! @brief ボタンの非表示
+    //!
+    //! @param[in] なし
+    //!
+    //! @return なし
+    //----------------------------------------------------------------------
+    public void SetButtonOff()
+    {
+        TitleButton.SetActive(false);
+        SelectButton.SetActive(false);
+    }
+    //----------------------------------------------------------------------
+    //! @brief キャンバスの非表示
+    //!
+    //! @param[in] なし
+    //!
+    //! @return なし
+    //----------------------------------------------------------------------
+    public void SetCanvasActive()
+    {
+        CanvasBord.SetActive(false);
+        CanvasSpeedButton.SetActive(false);
+        CanvasResetButton.SetActive(false);
+        CanvasSetButton.SetActive(false);
+        CanvasPlayButton.SetActive(false);
+    }
+
+    //----------------------------------------------------------------------
+    //! @brief ゲーム終了時のフラグ管理()
+    //!
+    //! @param[in] なし
+    //!
+    //! @return なし
+    //----------------------------------------------------------------------
+    void ClearControl()
+    {
+        //ClearFlagがtrueだったら
+        if (ClearFlag)
+        {
+            //Clearの座標が画面の中心に行くまで下がっていく
+            if (T_GameClear.transform.position.y > FallPos)
+            {
+                for (int i = 0; i < RoopCnt; i++)
+                {
+                    T_GameClear.transform.position -= new Vector3(0, FallNum, 0);
+                }
+            }
+            else
+            {
+                GameObject.Find("GameManager").GetComponent<ToResultScene>().ToClear(0);
+                Invoke("SetButtonOn", 2.0f);
+            }
+        }
+    }
+    //----------------------------------------------------------------------
+    //! @brief ゲーム終了時のフラグ管理()
+    //!
+    //! @param[in] なし
+    //!
+    //! @return なし
+    //----------------------------------------------------------------------
+    void OverControl()
+    {
+        //OverFlagがtrueだったら
+        if (OverFlag)
+        {
+            //Overの座標が画面の中心に行くまで下がっていく
+            if (GameOver.transform.position.y > FallPos)
+            {
+                for (int i = 0; i < RoopCnt; i++)
+                {
+                    GameOver.transform.position -= new Vector3(0, FallNum, 0);
+                }
+            }
+            else
+            {
+                GameObject.Find("GameManager").GetComponent<ToResultScene>().ToOver(0);
+                Invoke("SetButtonOn", 2.0f);
+            }
+        }
     }
 }
 
