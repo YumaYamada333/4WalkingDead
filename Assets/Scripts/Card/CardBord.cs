@@ -61,6 +61,10 @@ public class CardBord : MonoBehaviour {
     //ゲームの状態
     GameManager state;
 
+    // 画面のスクロールスクリプト
+    [SerializeField]
+    ScrollScript scroolScript;
+
     // Use this for initialization
     void Start ()
     {
@@ -341,8 +345,16 @@ public class CardBord : MonoBehaviour {
     void Scroll()
     {
         if (Input.GetMouseButtonDown(0) && mouse_system.Collider(gameObject)) canScroll = true;
-        else if (Input.GetMouseButtonUp(0)) canScroll = false; 
+        else if (Input.GetMouseButtonUp(0)) canScroll = false;
 
+        if (canScroll)
+        {
+            scroolScript.isUpdate = false;
+        }
+        else
+        {
+            scroolScript.isUpdate = true;
+        }
 
         if (Input.GetMouseButton(0) && canScroll)
         {
