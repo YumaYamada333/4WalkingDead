@@ -220,6 +220,8 @@ public class CardBord : MonoBehaviour {
             }
         }
 
+        Scroll();
+
         if (true)
         {
             // 使用済みカードの非表示化
@@ -253,7 +255,6 @@ public class CardBord : MonoBehaviour {
             }
         }
 
-        Scroll();
     }
     public bool CheckRightEnd()
     {
