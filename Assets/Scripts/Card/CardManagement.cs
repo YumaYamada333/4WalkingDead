@@ -508,5 +508,4 @@ public class CardManagement : MonoBehaviour {
     {
         return gripFlag;
     }
-
 }

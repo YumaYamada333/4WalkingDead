@@ -100,9 +100,35 @@ public class CountDown : MonoBehaviour {
                     color = Color.yellow;
                     break;
                 default:
+                    color = Color.clear;
                     break;
             }
             T_count.color += color;
+        }
+    }
+
+    // カウントダウンの設定
+    static public void SetCountDown(CardManagement.CardType type)
+    {
+        switch (type)
+        {
+            case CardManagement.CardType.Start:
+                break;
+            case CardManagement.CardType.Move:
+                CountDown.SetCountDown(CountDown.CountType.ActionMove);
+                break;
+            case CardManagement.CardType.Jump:
+                break;
+            case CardManagement.CardType.Attack:
+                break;
+            case CardManagement.CardType.Finish:
+                break;
+            case CardManagement.CardType.Nothing:
+                break;
+            case CardManagement.CardType.NumType:
+                break;
+            default:
+                break;
         }
     }
 
