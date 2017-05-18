@@ -366,7 +366,8 @@ public class PlayerAction : MonoBehaviour
                     //アニメーションを止める
                     animator.SetBool(animation, false);
                     //カウントダウンフラグを立てる
-                    CountDown.SetCountDown(CountDown.CountType.ActionMove);
+                    CardBord board = GameObject.Find("ActionBord").GetComponent<CardBord>();
+                    CountDown.SetCountDown(board.GetCardType(board.usingCard - 1));
                     //次の場所との差
                     endPosition += nextPosition;
                     particleType = NONE;        //パーティカルの種類決定
