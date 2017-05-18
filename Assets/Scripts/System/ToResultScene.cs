@@ -43,16 +43,7 @@ public class ToResultScene : MonoBehaviour {
 
                 break;
         }
-        Invoke("ToOverScene", waitTime);
+        //Invoke("ToOverScene", waitTime);
     }
 
-    void ToClearScene()
-    {
-        Application.LoadLevel("Result");
-    }
-
-    void ToOverScene()
-    {
-        Application.LoadLevel("Over");
-    }
 }
