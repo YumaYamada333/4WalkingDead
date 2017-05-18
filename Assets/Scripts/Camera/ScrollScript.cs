@@ -17,6 +17,8 @@ public class ScrollScript : MonoBehaviour
     private float StartBlockX;          //スタートブロックのｘ座標
     private float GoalBlockX;           //ゴールブロックのｘ座標
 
+    public bool isUpdate;
+
     CardManagement cardmanegement;      //カードマネジメント
 
     // Use this for initialization
@@ -33,60 +35,63 @@ public class ScrollScript : MonoBehaviour
     }
 
     // Update is called once per frame
-    void Update ()
+    void Update()
     {
-        //カメラの現在位置取得
-        CameraTmp = GameObject.Find("MainCamera").transform.position;
-
-        //左クリック
-        if (Input.GetMouseButton(0))
+        if (isUpdate)
         {
-            //クリック直後
-            if (!click_flag)
+            //左クリック
+            if (Input.GetMouseButton(0))
             {
-                //マウスの初期座標を取得
-                start_mouse_pos = Input.mousePosition;
-                click_flag = true;
-            }
-
-            //マウス座標を取得
-            Vector3 mouse_pos = Input.mousePosition;
-
-            //マウスクリック時カードをつかんでいないなら
-            if (cardmanegement.GetGripFlag() == false)
-            {
-                //カメラがゴールオブジェクトのx座標より左にあるのならば
-                if (CameraTmp.x <= GoalBlockX)
+                //クリック直後
+                if (!click_flag)
                 {
-                    //右にスクロール
-                    if (start_mouse_pos.x + scrollstart >= mouse_pos.x)
+                    //マウスの初期座標を取得
+                    start_mouse_pos = Input.mousePosition;
+                    click_flag = true;
+                }
+
+                //マウス座標を取得
+                Vector3 mouse_pos = Input.mousePosition;
+
+                //マウスクリック時カードをつかんでいないなら
+                if (cardmanegement.GetGripFlag() == false)
+                {
+                    //カメラがゴールオブジェクトのx座標より左にあるのならば
+                    if (CameraTmp.x <= GoalBlockX)
                     {
-                        //カメラを右スクロールさせる
-                        transform.Translate(0.15f, 0, 0);
+                        //右にスクロール
+                        if (start_mouse_pos.x + scrollstart >= mouse_pos.x)
+                        {
+                            //カメラを右スクロールさせる
+                            transform.Translate(0.15f, 0, 0);
+                        }
+                    }
+                    //カメラがスタートオブジェクトのx座標より右にあるのならば
+                    if (CameraTmp.x >= StartBlockX)
+                    {
+                        //左にスクロール
+                        if (start_mouse_pos.x - scrollstart <= mouse_pos.x)
+                        {
+                            //カメラを左スクロールさせる
+                            transform.Translate(-0.15f, 0, 0);
+                        }
                     }
                 }
-                //カメラがスタートオブジェクトのx座標より右にあるのならば
-                if (CameraTmp.x >= StartBlockX)
-                {
-                    //左にスクロール
-                    if (start_mouse_pos.x - scrollstart <= mouse_pos.x)
-                    {
-                        //カメラを左スクロールさせる
-                        transform.Translate(-0.15f, 0, 0);
-                    }
-                }
+            }
+            else
+            {
+                click_flag = false;
             }
         }
-        else
-        {
-            click_flag = false;
-        }
+            //カメラの現在位置取得
+            CameraTmp = GameObject.Find("MainCamera").transform.position;
 
-        //実行ボタンが押されたら
-        if (Input.GetButtonDown("Fire3"))
-        {
-            //カメラの初期位置に移動
-            GameObject.Find("Main Camera").transform.position = new Vector3(CameraPos.x, CameraPos.y, CameraPos.z);
+
+            //実行ボタンが押されたら
+            if (Input.GetButtonDown("Fire3"))
+            {
+                //カメラの初期位置に移動
+                GameObject.Find("Main Camera").transform.position = new Vector3(CameraPos.x, CameraPos.y, CameraPos.z);
+            }
         }
-    }
 }

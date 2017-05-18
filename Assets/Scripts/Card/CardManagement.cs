@@ -20,6 +20,7 @@ public class CardManagement : MonoBehaviour {
     public GameObject moveCard;
     public GameObject jumpCard;
     public GameObject attackCard;
+    public GameObject countCard;
     //public GameObject superMoveCard;
     //public GameObject superJumpCard;
     //public GameObject superAttackCard;
@@ -42,6 +43,7 @@ public class CardManagement : MonoBehaviour {
         Move,
         Jump,
         Attack,
+        Count,
         //SuperMove,
         //SuperJump,
         //SuperAttack,
@@ -106,6 +108,8 @@ public class CardManagement : MonoBehaviour {
     int attackNum;
     [SerializeField]
     int jumpNum;
+    [SerializeField]
+    int countNum;
 
     // Use this for initialization
     void Start () {
@@ -153,6 +157,11 @@ public class CardManagement : MonoBehaviour {
         {
             SetCard(CardType.Jump, CardType.Jump);
         }
+        for (int i = 0; i < countNum; i++)
+        {
+            SetCard(CardType.Count, CardType.Count);
+        }
+
 
         //// 仮所持カード
         //SetCard(CardType.Attack, CardType.Attack, 10);
@@ -358,6 +367,10 @@ public class CardManagement : MonoBehaviour {
                 case CardType.Attack:
                     card.obj = Instantiate(attackCard);
                     break;
+                case CardType.Count:
+                    card.obj = Instantiate(countCard);
+                    break;
+
                 //case CardType.SuperMove:
                 //    card.obj = Instantiate(superMoveCard);
                 //    break;
@@ -489,6 +502,10 @@ public class CardManagement : MonoBehaviour {
                 case CardType.Attack:
                     bord.SetCard(Instantiate(attackCard), data.setCard[i].type);
                     break;
+                case CardType.Count:
+                    bord.SetCard(Instantiate(countCard), data.setCard[i].type);
+                    break;
+
                 case CardType.Finish:
                     bord.SetCard(Instantiate(finishCard), data.setCard[i].type);
                     break;
