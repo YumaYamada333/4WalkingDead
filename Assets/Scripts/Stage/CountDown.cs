@@ -121,6 +121,9 @@ public class CountDown : MonoBehaviour {
                 break;
             case CardManagement.CardType.Attack:
                 break;
+            case CardManagement.CardType.Count:
+                CountDown.SetCountDown(CountDown.CountType.ActionCountDown);
+                break;
             case CardManagement.CardType.Finish:
                 break;
             case CardManagement.CardType.Nothing:

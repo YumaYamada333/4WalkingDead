@@ -425,7 +425,15 @@ public class PlayerAction : MonoBehaviour
                     //EffekseerHandle attack = EffekseerSystem.PlayEffect("attake", transform.position);
                     particleType = ATTACK;        //パーティカルの種類決定
                     break;
-
+                case CardManagement.CardType.Count:
+                    audioSource.PlayOneShot(Attack);        //音
+                    cardSetFlag = true;                     //カードセットフラグ
+                    animationNum = (int)ANIMATION.ATTACK;   //アニメーションの番号
+                    animationName = "Attack";               //アニメーションの名前
+                    //EffekseerHandle attack = EffekseerSystem.PlayEffect("attake", transform.position);
+                    particleType = ATTACK;        //パーティカルの種類決定
+                    CountDown.SetCountDown(type);
+                    break;
                 // スーパーシリーズ //
                 ////superMove
                 //case CardManagement.CardType.SuperMove:

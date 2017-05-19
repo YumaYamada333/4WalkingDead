@@ -32,6 +32,8 @@ public class CardBord : MonoBehaviour {
     // スクロールの状態
     float scrollStep;
 
+    // 使用中のカードの進行状態
+    public int stepUsing;
     // 使用中カード
     public int usingCard;
 
@@ -72,7 +74,7 @@ public class CardBord : MonoBehaviour {
         centerCard = 0;
         selectedSpace = 0;
         //numSet = 0;
-        usingCard = 0;
+        usingCard = stepUsing = 0;
         exceedFlag = false;
         scrollStep = 0.0f;
 

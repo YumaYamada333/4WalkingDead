@@ -451,7 +451,7 @@ public class CardManagement : MonoBehaviour {
         {
             CardType type = bord.GetCardType();
             if (bord.usingCard < bord.numSet)
-                bord.usingCard++;
+                bord.stepUsing++;
             else
                 type = CardType.Nothing;
 
@@ -464,9 +464,15 @@ public class CardManagement : MonoBehaviour {
         }
         else
         {
-            bord.usingCard = 0;
+            bord.usingCard = bord.stepUsing = 0;
             return bord.GetCardType();
         }
+    }
+
+    public void ApllyUsingCard()
+    {
+        CardBord bord = actionBord.GetComponent<CardBord>();
+        bord.usingCard = bord.stepUsing;
     }
 
     //  カードの情報関係 /////////////////////////////////////////////////////////////////////////////////

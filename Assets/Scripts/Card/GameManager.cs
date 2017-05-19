@@ -84,9 +84,17 @@ public class GameManager : MonoBehaviour
                     //プレイヤーがいることを確認
                     if (player != null)
                     {
+                        
+
                         //プレイヤーが地面にいるなら
                         if (player.IsGround())
+                        {
                             GameObject.Find("unitychan").GetComponent<PlayerAction>().ActionPlay(cardManage.ActtionCard(false));
+                            cardManage.ApllyUsingCard();
+
+
+                        }
+
                     }
                     //cardManage.ActtionCard(false);
                     cardTime = 0.0f;

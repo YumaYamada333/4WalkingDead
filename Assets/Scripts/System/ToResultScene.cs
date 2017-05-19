@@ -25,7 +25,7 @@ public class ToResultScene : MonoBehaviour {
 
     public void ToClear(int waitTime = 0)
     {
-        Invoke("ToClearScene", waitTime);
+        //Invoke("ToClearScene", waitTime);
     }
 
     public void ToOver(int waitTime = 0, OverType type = OverType.FALL)
