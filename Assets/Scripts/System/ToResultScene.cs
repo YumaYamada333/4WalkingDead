@@ -25,7 +25,10 @@ public class ToResultScene : MonoBehaviour {
 
     public void ToClear(int waitTime = 0)
     {
-        //Invoke("ToClearScene", waitTime);
+        if (!player.GetComponent<Animator>().GetBool("Clear"))
+            player.GetComponent<PlayerAction>().AnimationStop();
+        player.GetComponent<Animator>().SetBool("Clear", true);
+        player.GetComponent<PlayerAction>().enabled = false;
     }
 
     public void ToOver(int waitTime = 0, OverType type = OverType.FALL)

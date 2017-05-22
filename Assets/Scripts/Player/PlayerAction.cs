@@ -546,6 +546,24 @@ public class PlayerAction : MonoBehaviour
             }
         }
 
+        // ブロック
+        if (coll.gameObject.tag == "Block")
+        {
+            if (GameOver == null)
+            {
+                //カードボードなどの操作系を消す
+                Invoke("SetCanvasActive", 0);
+                //プレイヤーのアクションを止める
+                AnimationStop();
+                //"Over"を生成
+                GameOver = Instantiate(T_GameOver);
+                //Overを画面外にセット
+                GameOver.transform.position = new Vector3(CameraPos.x, FallPosY, FallPosZ);
+                //Overの文字を移動するためのフラグをonに
+                OverFlag = true;
+            }
+        }
+
         //落下限界
         if (coll.gameObject.tag == "GameOverZone")
         {
