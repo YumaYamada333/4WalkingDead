@@ -109,6 +109,17 @@ public class PlayerAction : MonoBehaviour
     //パーティカルの種類判別用
     public int particleType;
 
+    ////int layerMask = 1 << LayerMask.NameToLayer("Untagged");
+    RaycastHit slideHit;
+    bool isSliding;
+    bool isSlidisgOld;
+    float h;
+    float v;
+    float speed;
+    float jumpspped = 30f;
+    public float gravity = 5.8f;
+    float slideSpeed = 30.0f;
+    Vector3 dir;
     void OnEnable() //objが生きている場合
     {
         if (time <= 0)
@@ -122,6 +133,10 @@ public class PlayerAction : MonoBehaviour
     // Use this for initialization
     void Start()
     {
+        h = v = 0;
+        speed = 20;
+        dir = Vector3.zero;
+        //Physics.gravity = new Vector3(0, 20.81f, 0);
         //参照の取得
         animator = GetComponent<Animator>();
         audioSource = gameObject.GetComponent<AudioSource>();
@@ -132,25 +147,6 @@ public class PlayerAction : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        ////パーティカルカウントを戻す
-        //particleCnt = false;
-
-        //(使うかもしれないのでコメントアウト)
-        //Ray ray = new Ray(transform.position /*+ new Vector3(0,0.1f,0)*/, Vector3.down); //ray
-        //RaycastHit hit; //rayと接触したcolliderの判定
-        //debug//
-        //Debug.DrawLine(ray.origin, transform.position + Vector3.down , Color.red);
-        //rayとの当たり判定
-        //if (Physics.Raycast(ray, out hit, distance))
-        //{
-        //    //Debug.Log(hit.transform.name);
-        //}
-        //else
-        //{
-        //    //Run
-
-
-        //}
 
         //カメラのポジション
         CameraPos = GameObject.FindGameObjectWithTag("MainCamera").transform.position;
@@ -160,22 +156,25 @@ public class PlayerAction : MonoBehaviour
         //走っている場合
         if (animationFlag[(int)ANIMATION.RUN])
         {
-            if (isGround)       //地面についている
-                middlePosition.y = transform.position.y;    //中央地点yを今のプレイヤーの座標にする
-            if (!isGround)      //地面についていない
-                middlePosition.y -= 1.0f;                   //中央地点yを引く
+            if (Vector3.Angle(slideHit.normal, Vector3.up) > controller.slopeLimit)
+            {
+                isSliding = true;
+                isSlidisgOld = true;
+            }
+            else
+            {
+                isSliding = false;
+            }
         }
-        //中央地点yがステージの高さより低い場合
-        if (middlePosition.y < Constants.StageHeight)
-            middlePosition.y = Constants.StageHeight;   //ステージの高さにする
+        Debug.Log(isSliding);
         //敵の数を取得
         enemy = GameObject.FindGameObjectsWithTag("Enemy");
 
         //エフェクトの再生
         PlayEffect(animationNum);
 
-        //今現在のy地点をに記憶させる
-        endPosition.y = transform.position.y;
+        //プレイヤーの重力による座標の処理
+        GravityForPlayer();
 
         //待機中の場合
         if (IsIdle())
@@ -186,32 +185,71 @@ public class PlayerAction : MonoBehaviour
             //中間地点xを取得
             middlePosition.x = endPosition.x - nextPosition.x / 2;
         }
-        //現在地の処理
-        nowPosition(animationNum, animationName);
+        //アクションを決める
+        SetAction(animationNum);
+        //プレイヤーの移動
+        PlayerMove(animationNum, animationName);
 
-        //敵との当たり判定
-        for (int i = 0; i < enemy.Length; i++)
+        if (Physics.Raycast(transform.position, Vector3.forward, out slideHit))
         {
-            //attack
-            if (animationFlag[(int)ANIMATION.ATTACK] == true)
-                PlayerAttack(i, Constants.Attack);
-            //superAttack
-            //if (animationFlag[(int)ANIMATION.SUPERATTACK] == true)
-            //    PlayerAttack(i, Constants.SuperAttack);
-            //バグったとき用
-            //if (enemy[i].transform.position.x - transform.position.x <= Constants.MassDistance && transform.position.y > enemy[i].transform.position.y && enemy[i].transform.position.y - transform.position.y >= -0.5f)
-            //{
-            //    Destroy(enemy[i]);
-            //    audioSource.PlayOneShot(Hit);
-            //    //エフェクト再生
-            //    EffekseerHandle e_damage = EffekseerSystem.PlayEffect("EnemyDamage", transform.position);
-            //}
+            //敵との当たり判定
+            for (int i = 0; i < enemy.Length; i++)
+            {
+                //attack
+                if (animationFlag[(int)ANIMATION.ATTACK] == true)
+                    //PlayerAttack(i, Constants.Attack);
+                    Destroy(enemy[i]);
+            }
 
         }
         //characterとgroundの判定
         if (controller.isGrounded)
         {
             isGround = true;
+            if (isSliding)
+            {
+                //middlePosition.x = transform.position.x + Constants.RunPow / 2;
+                //endPosition.x = transform.position.x + Constants.RunPow;
+                ////カードセットの処理を止める
+                //cardSetFlag = false;
+                ////アニメーション
+                //animator.SetBool(0, true);
+                ////経過時間
+                //diff = Time.time - startTime;
+                ////進行率
+                //var rate = diff / time;
+
+                ////等速で移動させる
+                //transform.position = Vector3.Lerp(startPosition, middlePosition, rate);
+                ////中間地点を超えたら
+                //if (diff > time)
+                //{
+                //    //middlePosの情報をstartPosに代入
+                //    startPosition.y = middlePosition.y;
+                //    //等速で移動させる
+                //    transform.position = Vector3.Lerp(startPosition, endPosition, rate / 2);
+                //    //endPositionに到着
+                //    if (diff > time * 2)
+                //    {
+
+                //        //animationを止めるフラグ
+                //        animationFlag[0] = false;
+                //        //アニメーションを止める
+                //        animator.SetBool(0, false);
+                //        //次の場所との差
+                //        endPosition += nextPosition;
+                //        particleCnt = 0;
+                //    }
+                //}
+
+                Vector3 hitNormal = slideHit.normal;
+                dir.x = hitNormal.x * 10;
+                dir.y = gravity * Time.deltaTime;
+                dir.z = hitNormal.z;
+                transform.position += dir * Time.deltaTime * 1.1f;
+                //transform.position += new Vector3(0.95f, 0, 0);
+                //controller.Move(dir * Time.deltaTime);
+            }
         }
         else
         {
@@ -223,9 +261,31 @@ public class PlayerAction : MonoBehaviour
 
         //OverFlagがtrueだったら
         OverControl();
-
     }
 
+    //----------------------------------------------------------------------
+    //! @brief プレイヤーの重力による座標の処理
+    //!
+    //! @param[in] なし
+    //!
+    //! @return なし
+    //----------------------------------------------------------------------
+    void GravityForPlayer()
+    {
+        //走っている場合
+        if (animationFlag[(int)ANIMATION.RUN])
+        {
+            if (isGround)       //地面についている
+                middlePosition.y = transform.position.y;    //中央地点yを今のプレイヤーの座標にする
+            if (!isGround)      //地面についていない
+                middlePosition.y -= 1.0f;                   //中央地点yを引く
+        }
+        //中央地点yがステージの高さより低い場合
+        if (middlePosition.y < Constants.StageHeight)
+            middlePosition.y = Constants.StageHeight;   //ステージの高さにする
+        //今現在のy地点をに記憶させる
+        endPosition.y = transform.position.y;
+    }
     //----------------------------------------------------------------------
     //! @brief プレイヤーの攻撃
     //!
@@ -272,13 +332,13 @@ public class PlayerAction : MonoBehaviour
     }
 
     //----------------------------------------------------------------------
-    //! @brief 現在地の処理
+    //! @brief アクションを決める
     //!
-    //! @param[in] アニメーションの番号、アニメーションの名前
+    //! @param[in] アニメーションの番号
     //!
     //! @return なし
     //----------------------------------------------------------------------
-    void nowPosition(int animationFlagNum, System.String animation)
+    void SetAction(int animationFlagNum)
     {
         //カードをセットした
         if (cardSetFlag == true)
@@ -311,32 +371,20 @@ public class PlayerAction : MonoBehaviour
                     //移動しない
                     endPosition = new Vector3(transform.position.x, endPosition.y, 0);
                     break;
-                    //スーパーシリーズ//
-                    //superRun
-                    //case (int)ANIMATION.SUPERRUN:
-                    //    //1.5マス進む
-                    //    middlePosition = new Vector3(middlePosition.x + nextPosition.x, middlePosition.y, 0);
-                    //    //3マス進む
-                    //    endPosition = new Vector3(endPosition.x + nextPosition.x * 2, endPosition.y, 0);
-                    //    break;
-                    ////superJump
-                    //case (int)ANIMATION.SUPERJUMP:
-                    //    //middlePosにjumpPowを足す
-                    //    middlePosition = new Vector3(middlePosition.x + nextPosition.x / 2, middlePosition.y += jumpPower * 2, 0);
-                    //    //2マス進む
-                    //    endPosition = new Vector3(endPosition.x + nextPosition.x, endPosition.y, 0);
-                    //    break;
-                    ////superAttack
-                    //case (int)ANIMATION.SUPERATTACK:
-                    //    //移動しない
-                    //    middlePosition = new Vector3(transform.position.x, middlePosition.y, 0);
-                    //    //移動しない
-                    //    endPosition = new Vector3(transform.position.x, endPosition.y, 0);
-                    //    break;
-
             }
 
         }
+
+    }
+    //----------------------------------------------------------------------
+    //! @brief プレイヤーの移動
+    //!
+    //! @param[in] アニメーションの番号、アニメーションの名前
+    //!
+    //! @return なし
+    //----------------------------------------------------------------------
+    void PlayerMove(int animationFlagNum, System.String animation)
+    {
         //アニメーションが実行された
         if (animationFlag[animationFlagNum] == true)
         {
@@ -405,7 +453,6 @@ public class PlayerAction : MonoBehaviour
                     cardSetFlag = true;                 //カードセットフラグ
                     animationNum = (int)ANIMATION.RUN;  //アニメーションの番号
                     animationName = "Run";              //アニメーションの名前
-                    //EffekseerHandle run = EffekseerSystem.PlayEffect("smoke", transform.position);  //エフェクト再生
                     particleType = MOVE;               //パーティクルの種類決定
                     break;
                 //jump
@@ -422,7 +469,6 @@ public class PlayerAction : MonoBehaviour
                     cardSetFlag = true;                     //カードセットフラグ
                     animationNum = (int)ANIMATION.ATTACK;   //アニメーションの番号
                     animationName = "Attack";               //アニメーションの名前
-                    //EffekseerHandle attack = EffekseerSystem.PlayEffect("attake", transform.position);
                     particleType = ATTACK;        //パーティカルの種類決定
                     break;
                 case CardManagement.CardType.Count:
@@ -490,10 +536,10 @@ public class PlayerAction : MonoBehaviour
         //プレイヤーと敵が当たったら
         if (coll.gameObject.tag == "Enemy")
         {
+            // 五秒後にゲームオーバー
+            GameObject.Find("GameManager").GetComponent<ToResultScene>().ToOver(0, ToResultScene.OverType.FALL);
             particleType = DAMAGE;        //パーティカルの種類決定
 
-            //////エフェクト再生
-            //EffekseerHandle p_damage = EffekseerSystem.PlayEffect("PlayerDamage", transform.position);
             if (GameOver == null)
             {
                 //カードボードなどの操作系を消す
@@ -513,6 +559,7 @@ public class PlayerAction : MonoBehaviour
         {
             particleType = NONE;        //パーティカルの種類決定
         }
+
         //プレイヤーがゴールについたら
         if (coll.gameObject.tag == "Goal")
         {
@@ -545,7 +592,6 @@ public class PlayerAction : MonoBehaviour
                 OverFlag = true;
             }
         }
-
         // ブロック
         if (coll.gameObject.tag == "Block")
         {
@@ -622,6 +668,15 @@ public class PlayerAction : MonoBehaviour
                 {
                     particleType = NONE;        //パーティカルの種類決定
                 }
+            }
+        }
+        if (hit.gameObject.tag == "Untagged" && IsIdle())
+        {
+            float pos = transform.position.x;
+            if (pos % 2 != 0 /*&& pos != 0*/ && isSlidisgOld == true)
+            {
+                transform.position = new Vector3(Mathf.FloorToInt(transform.position.x) + 1, transform.position.y, transform.position.z);
+                isSlidisgOld = false;
             }
         }
     }
@@ -772,4 +827,5 @@ public class PlayerAction : MonoBehaviour
         }
     }
 }
+
 
