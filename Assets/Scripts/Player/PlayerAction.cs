@@ -14,29 +14,30 @@ using UnityEngine;
 //定数の定義
 static class Constants
 {
-    public const int Attack = 1;        //attak
+    public const int Attack      = 1;  //attak
     public const int StageHeight = 2;  //ステージの高さ
-    public const int RunPow = 2;       //走る距離
+    public const int RunPow      = 2;  //走る距離
     public const int SuperAttack = 3;  //superattack
-    public const int MaxEnemy = 4;     //敵の数
-    public const int MaxJumpPow = 5;   //最大のジャンプ力
-    public const int MaxAnimation = 6; //最大のアニメーションの数
-    public const int MaxTime = 10;     //最大時間
-    public const int MoveCount = 60;   //移動エフェクトのループ再生する間隔
+    public const int MaxEnemy    = 4;  //敵の数
+    public const int MaxJumpPow  = 5;  //最大のジャンプ力
+    public const int MaxAnimation= 6;  //最大のアニメーションの数
+    public const int MaxTime     = 10; //最大時間
+    public const int MoveCount   = 60; //移動エフェクトのループ再生する間隔
 
-    public const float Adjustment = 0.5f;   //調整
+    public const float Adjustment   = 0.5f; //調整
     public const float MassDistance = 2.2f; //マスの距離
 }
 //アニメーション
-enum ANIMATION { RUN, JUMP, ATTACK, OVER };
+enum ANIMATION { MOVE, JUMP, ATTACK, OVER };
+//パーティクル
+enum PARTICLE { NONE, MOVE,ATTACK,DAMAGE,LANDING};
 public class PlayerAction : MonoBehaviour
 {
     private int effect_count = 0;   //エフェクト再生用のカウント
     private int animationNum = 0;   //アニメーションの番号
 
-    private float time = 0.5f; //時間
+    private float time      = 0.5f; //時間
     private float jumpPower = 2.14f;//ジャンプ
-    private float distance = 1.0f; //rayの長さを決める
     private float diff;             //経過時間
     private float startTime;        //走り始めた時間
 
@@ -45,14 +46,14 @@ public class PlayerAction : MonoBehaviour
     private bool cardSetFlag;   //カードがセットされたかどうかのフラグ
     private bool isGround;      //地面についているかのフラグ
     private Vector3 middlePosition; 　                    //中間地点
-    private Vector3 endPosition = new Vector3(2, 0, 0);  //走り終わる場所
+    private Vector3 endPosition = new Vector3(2, 0, 0);   //走り終わる場所
     private Vector3 nextPosition = new Vector3(2, 0, 0);  //次の場所
     private Vector3 startPosition;                        //走り始める場所
 
     private System.String animationName;  //アニメーションの名前
     private GameObject[] enemy;           //敵
-    private AudioSource audioSource;     //音
-    private Animator animator;        //アニメーター
+    private AudioSource audioSource;      //音
+    private Animator animator;            //アニメーター
     private CharacterController controller;  //charactercontroller
 
     //Resultを動かすためのフラグ
@@ -63,7 +64,6 @@ public class PlayerAction : MonoBehaviour
     public GameObject T_GameClear;
     // オーバーコンポーネント
     public GameObject T_GameOver;
-
     private GameObject GameOver;
 
     //ゲーム終了時に表示するボタン
@@ -100,26 +100,22 @@ public class PlayerAction : MonoBehaviour
     public AudioClip Hit;
     public AudioClip Move;
 
-    //パーティクルの種類
-    const int NONE = 0;
-    const int MOVE = 1;
-    const int ATTACK = 2;
-    const int DAMAGE = 3;
-    const int LANDING = 4;
     //パーティカルの種類判別用
     public int particleType;
 
-    ////int layerMask = 1 << LayerMask.NameToLayer("Untagged");
-    RaycastHit slideHit;
-    bool isSliding;
-    bool isSlidisgOld;
-    float h;
-    float v;
-    float speed;
-    float jumpspped = 30f;
-    public float gravity = 5.8f;
-    float slideSpeed = 30.0f;
-    Vector3 dir;
+    //滑る床関連
+    RaycastHit slideHit;         //Ray
+    bool isSliding;              //下のオブジェクトが斜めかどうか
+    bool isSlidisgOld;           //下のオブジェクトが斜めだったかどうか
+    public float gravity = 5.8f; //滑っている最中の重力
+    Vector3 dir;                 //滑る時に格納するvec3
+
+    //滑る床のLerp用
+    Vector3 slideStartPos;  //開始座標
+    Vector3 slideEndPos;    //終了座標
+    float slideStartTime;   //時間
+    bool isSlideLerp;       //補完するべきか
+
     void OnEnable() //objが生きている場合
     {
         if (time <= 0)
@@ -133,8 +129,6 @@ public class PlayerAction : MonoBehaviour
     // Use this for initialization
     void Start()
     {
-        h = v = 0;
-        speed = 20;
         dir = Vector3.zero;
         //Physics.gravity = new Vector3(0, 20.81f, 0);
         //参照の取得
@@ -147,24 +141,26 @@ public class PlayerAction : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-
         //カメラのポジション
         CameraPos = GameObject.FindGameObjectWithTag("MainCamera").transform.position;
         //OverPosに代入
         FallPosY = CameraPos.y / 2 + 10;
-
-        if (Vector3.Angle(slideHit.normal, Vector3.up) > controller.slopeLimit)
-        {
-            isSliding = true;
-            isSlidisgOld = true;
+        //真下にRayを飛ばして、当たっているかどうか
+        if (Physics.Raycast(transform.position, Vector3.down, out slideHit, 1.0f))
+         {
+            //下のオブジェクトが斜めかどうか
+            if (Vector3.Angle(slideHit.normal, Vector3.up) > controller.slopeLimit)
+            {
+                isSliding = true;
+                isSlidisgOld = true;
+            }
+            else
+            {
+                isSliding = false;
+            }
         }
-        else
-        {
-            isSliding = false;
-        }
-
         //走っている場合
-        if (animationFlag[(int)ANIMATION.RUN])
+        if (animationFlag[(int)ANIMATION.MOVE])
         {
             if (isGround)       //地面についている
                 middlePosition.y = transform.position.y;    //中央地点yを今のプレイヤーの座標にする
@@ -197,7 +193,23 @@ public class PlayerAction : MonoBehaviour
         SetAction(animationNum);
         //プレイヤーの移動
         PlayerMove(animationNum, animationName);
-
+        //補完するべきの場合
+        if(isSlideLerp)
+        {   
+            //歩く
+            animator.SetBool("Move", true);
+            //補完
+            var diff = Time.timeSinceLevelLoad - slideStartTime;
+            var rate = diff / time;
+            transform.position = Vector3.Lerp(slideStartPos, slideEndPos, rate);
+            //終わったら
+            if(diff > time)
+            {
+                //止まる
+                animator.SetBool("Move", false);
+                isSlideLerp = false;
+            }
+        }
         if (Physics.Raycast(transform.position, Vector3.forward, out slideHit))
         {
             //敵との当たり判定
@@ -205,58 +217,21 @@ public class PlayerAction : MonoBehaviour
             {
                 //attack
                 if (animationFlag[(int)ANIMATION.ATTACK] == true)
-                    //PlayerAttack(i, Constants.Attack);
                     Destroy(enemy[i]);
             }
-
         }
         //characterとgroundの判定
         if (controller.isGrounded)
         {
             isGround = true;
+            //下のオブジェクトが斜めだった場合
             if (isSliding)
             {
-                //middlePosition.x = transform.position.x + Constants.RunPow / 2;
-                //endPosition.x = transform.position.x + Constants.RunPow;
-                ////カードセットの処理を止める
-                //cardSetFlag = false;
-                ////アニメーション
-                //animator.SetBool(0, true);
-                ////経過時間
-                //diff = Time.time - startTime;
-                ////進行率
-                //var rate = diff / time;
-
-                ////等速で移動させる
-                //transform.position = Vector3.Lerp(startPosition, middlePosition, rate);
-                ////中間地点を超えたら
-                //if (diff > time)
-                //{
-                //    //middlePosの情報をstartPosに代入
-                //    startPosition.y = middlePosition.y;
-                //    //等速で移動させる
-                //    transform.position = Vector3.Lerp(startPosition, endPosition, rate / 2);
-                //    //endPositionに到着
-                //    if (diff > time * 2)
-                //    {
-
-                //        //animationを止めるフラグ
-                //        animationFlag[0] = false;
-                //        //アニメーションを止める
-                //        animator.SetBool(0, false);
-                //        //次の場所との差
-                //        endPosition += nextPosition;
-                //        particleCnt = 0;
-                //    }
-                //}
-
-                Vector3 hitNormal = slideHit.normal;
-                dir.x = hitNormal.x * 10;
-                dir.y = gravity * Time.deltaTime;
-                dir.z = hitNormal.z;
-                transform.position += dir * Time.deltaTime * 1.1f;
-                //transform.position += new Vector3(0.95f, 0, 0);
-                //controller.Move(dir * Time.deltaTime);
+                Vector3 hitNormal = slideHit.normal; //法線ベクトルを取得
+                dir.x = hitNormal.x * 10;            //そのままの法線ベクトルだと小さすぎるので大きくする
+                dir.y = gravity * Time.deltaTime;    //重力を強めにかける
+                dir.z = hitNormal.z;                 //そのまま
+                transform.position += dir * Time.deltaTime * 1.1f;　//滑らせる
             }
         }
         else
@@ -280,8 +255,8 @@ public class PlayerAction : MonoBehaviour
     //----------------------------------------------------------------------
     void GravityForPlayer()
     {
-        //走っている場合
-        if (animationFlag[(int)ANIMATION.RUN])
+        //move
+        if (animationFlag[(int)ANIMATION.MOVE])
         {
             if (isGround)       //地面についている
                 middlePosition.y = transform.position.y;    //中央地点yを今のプレイヤーの座標にする
@@ -312,8 +287,6 @@ public class PlayerAction : MonoBehaviour
             Destroy(enemy[i]);
             //音を出す
             audioSource.PlayOneShot(Hit);
-            ////エフェクト再生
-            //EffekseerHandle e_damage = EffekseerSystem.PlayEffect("EnemyDamage", transform.position);
         }
     }
     //----------------------------------------------------------------------
@@ -326,8 +299,7 @@ public class PlayerAction : MonoBehaviour
     public bool IsIdle()
     {
         //待機中の場合
-        if (animationFlag[(int)ANIMATION.RUN] == false && animationFlag[(int)ANIMATION.JUMP] == false && animationFlag[(int)ANIMATION.ATTACK] == false)// &&
-                                                                                                                                                       // animationFlag[(int)ANIMATION.SUPERRUN] == false && animationFlag[(int)ANIMATION.SUPERJUMP] == false && animationFlag[(int)ANIMATION.SUPERATTACK] == false)
+        if (animationFlag[(int)ANIMATION.MOVE] == false && animationFlag[(int)ANIMATION.JUMP] == false && animationFlag[(int)ANIMATION.ATTACK] == false)
         {
             idleFlag = true;
         }
@@ -360,8 +332,8 @@ public class PlayerAction : MonoBehaviour
             //アニメーションの番号を取得
             switch (animationFlagNum)
             {
-                //run
-                case (int)ANIMATION.RUN:
+                //move
+                case (int)ANIMATION.MOVE:
                     middlePosition.x = transform.position.x + Constants.RunPow / 2;
                     endPosition.x = transform.position.x + Constants.RunPow;
                     break;
@@ -426,19 +398,11 @@ public class PlayerAction : MonoBehaviour
                     CountDown.SetCountDown(board.GetCardType(board.usingCard - 1));
                     //次の場所との差
                     endPosition += nextPosition;
-                    particleType = NONE;        //パーティカルの種類決定
+                    particleType = (int)PARTICLE.NONE;        //パーティカルの種類決定
                 }
             }
 
         }
-        //テスト用
-        ////止める
-        //else if (animationFlag[animationFlagNum] == false)
-        //{
-        //    animator.SetBool(animation, false);
-
-        //}
-
     }
 
     //----------------------------------------------------------------------
@@ -459,9 +423,9 @@ public class PlayerAction : MonoBehaviour
                 case CardManagement.CardType.Move:
                     audioSource.PlayOneShot(Move);      //音
                     cardSetFlag = true;                 //カードセットフラグ
-                    animationNum = (int)ANIMATION.RUN;  //アニメーションの番号
-                    animationName = "Run";              //アニメーションの名前
-                    particleType = MOVE;               //パーティクルの種類決定
+                    animationNum = (int)ANIMATION.MOVE;  //アニメーションの番号
+                    animationName = "Move";              //アニメーションの名前
+                    particleType = (int)PARTICLE.MOVE;               //パーティクルの種類決定
                     break;
                 //jump
                 case CardManagement.CardType.Jump:
@@ -469,7 +433,7 @@ public class PlayerAction : MonoBehaviour
                     cardSetFlag = true;                 //カードセットフラグ
                     animationNum = (int)ANIMATION.JUMP; //アニメーションの番号
                     animationName = "Jump";             //アニメーションの名前
-                    particleType = NONE;        //パーティカルの種類決定
+                    particleType = (int)PARTICLE.NONE;        //パーティカルの種類決定
                     break;
                 //attack
                 case CardManagement.CardType.Attack:
@@ -477,7 +441,7 @@ public class PlayerAction : MonoBehaviour
                     cardSetFlag = true;                     //カードセットフラグ
                     animationNum = (int)ANIMATION.ATTACK;   //アニメーションの番号
                     animationName = "Attack";               //アニメーションの名前
-                    particleType = ATTACK;        //パーティカルの種類決定
+                    particleType = (int)PARTICLE.ATTACK;        //パーティカルの種類決定
                     break;
                 case CardManagement.CardType.Count:
                     audioSource.PlayOneShot(Attack);        //音
@@ -485,29 +449,9 @@ public class PlayerAction : MonoBehaviour
                     animationNum = (int)ANIMATION.ATTACK;   //アニメーションの番号
                     animationName = "Attack";               //アニメーションの名前
                     //EffekseerHandle attack = EffekseerSystem.PlayEffect("attake", transform.position);
-                    particleType = ATTACK;        //パーティカルの種類決定
+                    particleType = (int)PARTICLE.ATTACK;        //パーティカルの種類決定
                     CountDown.SetCountDown(type);
                     break;
-                // スーパーシリーズ //
-                ////superMove
-                //case CardManagement.CardType.SuperMove:
-                //    cardSetFlag = true;                         //カードセットフラグ
-                //    animationNum = (int)ANIMATION.SUPERRUN;     //アニメーションの番号
-                //    animationName = "Run";                      //アニメーションの名前
-                //    break;
-                ////superJump
-                //case CardManagement.CardType.SuperJump:
-                //    cardSetFlag = true;                         //カードセットフラグ
-                //    animationNum = (int)ANIMATION.SUPERJUMP;    //アニメーションの番号
-                //    animationName = "Jump";                     //アニメーションの名前
-                //    break;
-                ////superAttack
-                //case CardManagement.CardType.SuperAttack:
-                //    cardSetFlag = true;                         //カードセットフラグ
-                //    animationNum = (int)ANIMATION.SUPERATTACK;  //アニメーションの番号
-                //    animationName = "Attack";                   //アニメーションの名前
-                //    break;
-
                 //finish
                 case CardManagement.CardType.Finish:
                     cardSetFlag = true;                     //カードセットフラグ
@@ -546,7 +490,7 @@ public class PlayerAction : MonoBehaviour
         {
             // 五秒後にゲームオーバー
             GameObject.Find("GameManager").GetComponent<ToResultScene>().ToOver(0, ToResultScene.OverType.FALL);
-            particleType = DAMAGE;        //パーティカルの種類決定
+            particleType = (int)PARTICLE.DAMAGE;        //パーティカルの種類決定
 
             if (GameOver == null)
             {
@@ -565,7 +509,7 @@ public class PlayerAction : MonoBehaviour
         }
         else
         {
-            particleType = NONE;        //パーティカルの種類決定
+            particleType = (int)PARTICLE.NONE;        //パーティカルの種類決定
         }
 
         //プレイヤーがゴールについたら
@@ -600,23 +544,23 @@ public class PlayerAction : MonoBehaviour
                 OverFlag = true;
             }
         }
-        // ブロック
-        if (coll.gameObject.tag == "Block")
-        {
-            if (GameOver == null)
-            {
-                //カードボードなどの操作系を消す
-                Invoke("SetCanvasActive", 0);
-                //プレイヤーのアクションを止める
-                AnimationStop();
-                //"Over"を生成
-                GameOver = Instantiate(T_GameOver);
-                //Overを画面外にセット
-                GameOver.transform.position = new Vector3(CameraPos.x, FallPosY, FallPosZ);
-                //Overの文字を移動するためのフラグをonに
-                OverFlag = true;
-            }
-        }
+        // ブロック     回転すると死んじゃうよ～～～～
+        //if (coll.gameObject.tag == "Block")
+        //{
+        //    if (GameOver == null)
+        //    {
+        //        //カードボードなどの操作系を消す
+        //        Invoke("SetCanvasActive", 0);
+        //        //プレイヤーのアクションを止める
+        //        AnimationStop();
+        //        //"Over"を生成
+        //        GameOver = Instantiate(T_GameOver);
+        //        //Overを画面外にセット
+        //        GameOver.transform.position = new Vector3(CameraPos.x, FallPosY, FallPosZ);
+        //        //Overの文字を移動するためのフラグをonに
+        //        OverFlag = true;
+        //    }
+        //}
 
         //落下限界
         if (coll.gameObject.tag == "GameOverZone")
@@ -652,12 +596,6 @@ public class PlayerAction : MonoBehaviour
             // 五秒後にクリア
             GameObject.Find("GameManager").GetComponent<ToResultScene>().ToClear(3);
         }
-        ////トゲ
-        //if (hit.gameObject.tag == "Thorn")
-        //{
-        //    // 五秒後にゲームオーバー
-        //    GameObject.Find("GameManager").GetComponent<ToResultScene>().ToOver(2);
-        //}
         //地面
         if (!isGround)
         {
@@ -667,24 +605,33 @@ public class PlayerAction : MonoBehaviour
                 //middlePosを超えたら
                 if (diff > time)
                 {
-                    ////エフェクトの再生
-                    //EffekseerHandle jump = EffekseerSystem.PlayEffect("Landing", transform.position);
-
-                    particleType = LANDING;        //パーティカルの種類決定
+                    particleType = (int)PARTICLE.LANDING;        //パーティカルの種類決定
                 }
                 else
                 {
-                    particleType = NONE;        //パーティカルの種類決定
+                    particleType = (int)PARTICLE.NONE;        //パーティカルの種類決定
                 }
             }
         }
+        //tagがUntaggedで待機中の場合
         if (hit.gameObject.tag == "Untagged" && IsIdle())
         {
+            slideStartTime = Time.timeSinceLevelLoad;
+            slideStartPos = transform.position;
             float pos = transform.position.x;
-            if (pos % 2 != 0 /*&& pos != 0*/ && isSlidisgOld == true)
+            //場所が違う場合
+            if (pos % 2 != 0 && isSlidisgOld == true)
             {
-                transform.position = new Vector3(Mathf.FloorToInt(transform.position.x) + 1, transform.position.y, transform.position.z);
+                //補完する
+                slideEndPos = new Vector3(Mathf.FloorToInt(pos) + 1, transform.position.y, transform.position.z);
+                //まだ違う場合
+                if(slideEndPos.x % 2 != 0)
+                {
+                    //補完する
+                    slideEndPos = new Vector3(Mathf.FloorToInt(pos) + 2, transform.position.y, transform.position.z);
+                }
                 isSlidisgOld = false;
+                isSlideLerp = true;
             }
         }
     }
@@ -703,8 +650,8 @@ public class PlayerAction : MonoBehaviour
         {
             switch (anime_num)
             {
-                //run
-                case (int)ANIMATION.RUN:
+                //move
+                case (int)ANIMATION.MOVE:
                     //エフェクトを設定した間隔で再生
                     effect_count++;
                     if (effect_count >= Constants.MoveCount)
@@ -728,6 +675,10 @@ public class PlayerAction : MonoBehaviour
         return isGround;
     }
 
+    public bool IsSlideLerp()
+    {
+        return isSlideLerp;
+    }
     //----------------------------------------------------------------------
     //! @brief アニメーションを止める
     //!
