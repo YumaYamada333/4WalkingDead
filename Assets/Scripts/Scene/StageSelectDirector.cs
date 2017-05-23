@@ -81,9 +81,12 @@ public class StageSelectDirector : MonoBehaviour {
     // ボタンを押したときの処理
     public void PlayButton()
     {
-        CurtainControl CurtainSystem = GameObject.Find("Canvas").GetComponent<CurtainControl>();
-        //カーテンを閉める
-        CurtainSystem.curtainOut();
+        if(SceneManager.GetActiveScene().name != "StageSelect")
+        {
+            CurtainControl CurtainSystem = GameObject.Find("Canvas").GetComponent<CurtainControl>();
+            //カーテンを閉める
+            CurtainSystem.curtainOut();
+        }
         //遷移先のシーンをロード
         Invoke("StageScene", 2);
 

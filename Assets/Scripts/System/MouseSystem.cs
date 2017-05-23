@@ -130,6 +130,28 @@ public class MouseSystem : MonoBehaviour {
         return -1;
     }
 
+    public int GetMouseHit(CardBord.CardData[] cards)
+    {
+        for (int i = 0; i < cards.Length; i++)
+        {
+            if (cards[i].obj != null)
+            {
+                if (Collider(cards[i].obj))
+                {
+                    if (cards[i].type != CardManagement.CardType.Finish)
+                    {
+                        if (cards[i].obj.transform.position.x <= screen_pos.x)
+                            return i + 1;
+                        else
+                            return i;
+                    }
+                }
+            }
+        }
+        return -1;
+    }
+
+
     // マウスカーソルとオブジェクトの当たり判定
     public bool Collider(GameObject obj)
     {

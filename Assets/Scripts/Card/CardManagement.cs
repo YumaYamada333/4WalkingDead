@@ -295,11 +295,15 @@ public class CardManagement : MonoBehaviour {
                 // カードを移動
                 tuckCard.front.obj.transform.position = mouse_system.GetScreenPos();
 
+                CloneMove();
+
             }
             // してない
             else
             {
                 cursor = CursorForcusTag.HandsBord;
+
+                CardActive(true);
 
                 bord.selectedSpace = mouse_system.GetMouseHit(actionBord);
                 if (bord.selectedSpace >= 0)
@@ -335,6 +339,8 @@ public class CardManagement : MonoBehaviour {
                     cards[selectedCard].numHold--;
                     bord.Coordinate();
                 }
+                CleneDelete();
+
             }
 
             if (bord.usingCard > bord.selectedSpace)
@@ -531,4 +537,75 @@ public class CardManagement : MonoBehaviour {
     {
         return gripFlag;
     }
+
+
+    private GameObject[] card = null;
+    void CloneCreate()
+    {
+        // ActionBoardの情報を取得
+        CardBord bord = actionBord.GetComponent<CardBord>();
+
+        if (card == null)
+        {
+            card = new GameObject[bord.numSet];
+            for (int i = 0; i < bord.numSet; i++)
+            {
+                card[i] = Instantiate(bord.cards[i].obj);
+                card[i].transform.parent = GameObject.Find("ActionBord").transform;
+                card[i].transform.position = bord.cards[i].obj.transform.position;
+                card[i].transform.localScale = bord.cards[i].obj.transform.localScale;
+            }
+        }
+    }
+
+    void CloneMove()
+    {
+        // ActionBoardの情報を取得
+        CardBord bord = actionBord.GetComponent<CardBord>();
+        int selectCard = mouse_system.GetMouseHit(bord.cards);
+
+        if (selectCard >= 0)
+        {
+            CloneCreate();
+            CardActive(false);
+            if (card[0].transform.position.x >= bord.cards[0].obj.transform.position.x - cardSize.x / 2)
+            {
+                for (int i = 0; i < selectCard; i++)
+                    card[i].transform.position += new Vector3(-5, 0, 0);
+
+                for (int i = selectCard; i < bord.numSet; i++)
+                    card[i].transform.position += new Vector3(5, 0, 0);
+            }
+        }
+        else
+        {
+            CleneDelete();
+        }
+    }
+
+    void CleneDelete()
+    {
+        // ActionBoardの情報を取得
+        CardBord bord = actionBord.GetComponent<CardBord>();
+        if (card != null)
+        {
+            for (int i = 0; i < card.Length; i++)
+            {
+                Destroy(card[i]);
+            }
+            card = null;
+            CardActive(true);
+        }
+    }
+
+    void CardActive(bool active)
+    {
+        CardBord bord = actionBord.GetComponent<CardBord>();
+        for (int i = 0; i < bord.numSet; i++)
+        {
+            bord.cards[i].obj.SetActive(active);
+        }
+        //GameObject.Find("BoardButton").SetActive(active);
+    }
+
 }
