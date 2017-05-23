@@ -153,20 +153,28 @@ public class PlayerAction : MonoBehaviour
         //OverPosに代入
         FallPosY = CameraPos.y / 2 + 10;
 
+        if (Vector3.Angle(slideHit.normal, Vector3.up) > controller.slopeLimit)
+        {
+            isSliding = true;
+            isSlidisgOld = true;
+        }
+        else
+        {
+            isSliding = false;
+        }
+
         //走っている場合
         if (animationFlag[(int)ANIMATION.RUN])
         {
-            if (Vector3.Angle(slideHit.normal, Vector3.up) > controller.slopeLimit)
-            {
-                isSliding = true;
-                isSlidisgOld = true;
-            }
-            else
-            {
-                isSliding = false;
-            }
+            if (isGround)       //地面についている
+                middlePosition.y = transform.position.y;    //中央地点yを今のプレイヤーの座標にする
+            if (!isGround)      //地面についていない
+                middlePosition.y -= 1.0f;                   //中央地点yを引く
         }
-        Debug.Log(isSliding);
+        //中央地点yがステージの高さより低い場合
+        if (middlePosition.y < Constants.StageHeight)
+            middlePosition.y = Constants.StageHeight;   //ステージの高さにする
+
         //敵の数を取得
         enemy = GameObject.FindGameObjectsWithTag("Enemy");
 
