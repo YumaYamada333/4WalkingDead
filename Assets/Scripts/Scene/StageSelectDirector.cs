@@ -49,8 +49,15 @@ public class StageSelectDirector : MonoBehaviour {
     [SerializeField]
     private float stepSpd = 0.01f;
     private float changeStep = 0.0f;                            // 切り替えのステップ
-	// Use this for initialization
-	void Start ()
+    private enum StepDirction
+    {
+        Up,
+        Down,
+    };
+    StepDirction stepDir = StepDirction.Down;
+
+    // Use this for initialization
+    void Start ()
     {
         // ループ変数初期化
         m_selectPamphlet = new MathClass.Looper(m_pamphlet.Length - 1, 0, 0, 0);
@@ -60,7 +67,7 @@ public class StageSelectDirector : MonoBehaviour {
 
         // マウスのドラック量を初期化
         dragVecOld = GetComponent<MouseSystem>().GetDragVec();
-
+        changeStep = 1.0f;
         // 初期パンフレットの配置 配置空間の設定
         for (int i = 0; i < m_pamphlet.Length; i++)
         {
@@ -79,49 +86,80 @@ public class StageSelectDirector : MonoBehaviour {
         Vector2 dragVec = GetComponent<MouseSystem>().GetDragVec() - dragVecOld;
 
         // 切り替えが行われていない
-        if (changeStep <= 1.0f)
+        if (changeStep >= 1.0f)
         {
             if (Input.GetKeyDown(KeyCode.DownArrow)/*dragVec.y < -30*/)
             {
-                // 一番前のパンフが下に移動
-
-                // 他のパンフが手前に移動
-
-                // 一番後ろにパンフが追加
-
                 // 配置空間のパンフインデックスの更新
                 for (int i = 0; i < m_space.Length; i++)
                 {
                     m_selectPamphlet.Plus(1);
                     m_space[i].pamphlietIndex = m_selectPamphlet.Get();
                 }
+                stepDir = StepDirction.Down;
+                m_selectPamphlet.Plus(1);
                 changeStep = 0.0f;
             }
-            else if (Input.GetKeyDown(KeyCode.DownArrow)/*dragVec.y > 30*/)
+            else if (Input.GetKeyDown(KeyCode.UpArrow)/*dragVec.y > 30*/)
             {
-                // 一番後ろのパンフが下に移動
-
-                // 他のパンフが奥に移動
-
-                // 一番前に下からパンフ挿入
-
+                m_selectPamphlet.Plus(-2);
                 // 配置空間のパンフインデックスの更新
                 for (int i = 0; i < m_space.Length; i++)
                 {
-                    m_selectPamphlet.Plus(-1);
+                    m_selectPamphlet.Plus(1);
                     m_space[i].pamphlietIndex = m_selectPamphlet.Get();
                 }
+                stepDir = StepDirction.Up;
+                m_selectPamphlet.Plus(1);
                 changeStep = 0.0f;
             }
         }
-        else changeStep = changeStep + stepSpd > 1.0f ? 1.0f : changeStep + stepSpd;
+        else
+        {
+            changeStep = changeStep + stepSpd > 1.0f ? 1.0f : changeStep + stepSpd;
+        }
+        Debug.Log(m_space[0].pamphlietIndex);
+        // 何故かバグル
+        //Debug.Log(m_selectPamphlet.Get());
 
-        Debug.Log(m_selectPamphlet.Get());
-        //// 範囲外にならないように
-        //if (m_selectPamphlet >= m_pamphletData.Length)
-        //    m_selectPamphlet = 0;
-        //if (m_selectPamphlet < 0)
-        //    m_selectPamphlet = m_pamphletData.Length - 1;
+        /////////////////////////////////////////////////////////////////////////////
+
+
+        // パンフレットのラープ処理
+        for (int i = 0; i < m_pamphlet.Length; i++)
+        {
+            if (stepDir == StepDirction.Up)
+            {
+                if (i == 0 && changeStep < 0.3f)
+                {
+                    m_pamphlet[m_space[0].pamphlietIndex].transform.position =
+                        MathClass.Lerp(m_pamphlet[m_space[0].pamphlietIndex].transform.position,
+                    new Vector3(m_space[0].pos.x, m_space[0].pos.y - 20, m_space[0].pos.z),
+                    changeStep);
+                }
+                else
+                {
+                    //m_pamphlet[m_space[0].pamphlietIndex].transform.position =
+                    //    m_space[0].pos;
+                    m_pamphlet[m_space[i].pamphlietIndex].transform.position =
+                        MathClass.Lerp(m_pamphlet[m_space[i].pamphlietIndex].transform.position, m_space[i].pos, changeStep);
+                }
+            }
+            else
+            {
+                if (i == m_pamphlet.Length - 1 && changeStep < 0.3f)
+                {
+                    m_pamphlet[m_space[i].pamphlietIndex].transform.position =
+                        MathClass.Lerp(m_pamphlet[m_space[i].pamphlietIndex].transform.position,
+                    new Vector3(m_pamphlet[m_space[i].pamphlietIndex].transform.position.x, -100, m_pamphlet[m_space[i].pamphlietIndex].transform.position.z), changeStep);
+                }
+                else
+                {
+                    m_pamphlet[m_space[i].pamphlietIndex].transform.position =
+                        MathClass.Lerp(m_pamphlet[m_space[i].pamphlietIndex].transform.position, m_space[i].pos, changeStep);
+                }
+            }
+        }
 
         // 前フレーム更新
         dragVecOld = GetComponent<MouseSystem>().GetDragVec();

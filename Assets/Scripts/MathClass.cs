@@ -25,10 +25,26 @@ public class MathClass : MonoBehaviour {
 
         public void Plus(int a)
         {
-            a = a % (max - min);
-            value = value + a > max ? min + (value + a - max) :
-                value + a < min ? max + (value + a - min) : 
-                value + a;
+            a = a % ((max - min) + 1);
+            //value = value + a > max ? min + (value + a - max) :
+            //    value + a < min ? max + (value + a - min) : 
+            //    value + a;
+
+            if (value + a < min || value + a > max)
+            {
+                if (value + a > max)
+                {
+                    value = min - 1 + (value + a - max);
+                }
+                else
+                {
+                    value = max + 1 + (value + a - min);
+                }
+            }
+            else
+            {
+                value = value + a;
+            }
         }
 
         public void Reset()
@@ -43,7 +59,7 @@ public class MathClass : MonoBehaviour {
     }
 
     // Vector Lerp
-    public Vector3 Lerp(Vector3 sta, Vector3 end, float t)
+    static public Vector3 Lerp(Vector3 sta, Vector3 end, float t)
     {
         return new Vector3(Mathf.Lerp(sta.x, end.x, t),
             Mathf.Lerp(sta.y, end.y, t),
