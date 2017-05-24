@@ -31,8 +31,8 @@ public class StageSelectDirector : MonoBehaviour {
 
     private GameObject[] m_pamphlet = new GameObject[5];        // パンフレット
 
-	// Use this for initialization
-	void Start ()
+    // Use this for initialization
+    void Start ()
     {
         // 初期パンフレットの配置
         for (int i = 0; i < m_pamphlet.Length; i++)
@@ -40,8 +40,9 @@ public class StageSelectDirector : MonoBehaviour {
             m_pamphlet[i] = Instantiate(m_pamphletData[i].pamphletPrefab);
             m_pamphlet[i].transform.position = m_zeroPos + (m_pos * i);
         }
-
         // パンフが下から、リボンが上から規定位置まで移動
+
+
     }
 
     // Update is called once per frame
@@ -76,12 +77,14 @@ public class StageSelectDirector : MonoBehaviour {
             m_selectPamphlet = 0;
         if (m_selectPamphlet < 0)
             m_selectPamphlet = m_pamphletData.Length - 1;
+
+
     }
 
     // ボタンを押したときの処理
     public void PlayButton()
     {
-        if(SceneManager.GetActiveScene().name != "StageSelect")
+        if (SceneManager.GetActiveScene().name != "StageSelect")
         {
             CurtainControl CurtainSystem = GameObject.Find("Canvas").GetComponent<CurtainControl>();
             //カーテンを閉める
