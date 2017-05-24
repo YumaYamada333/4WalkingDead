@@ -74,12 +74,10 @@ public class GameManager : MonoBehaviour
                 // カードセットの操作を受け付けないようにする
                 //cardManage.isControlCard = false;
                 cardTime += Time.deltaTime;
-                //辻流己//
-                // if (cardTime > CPS)
                 //PlayrActionの情報を取得
                 PlayerAction player = playerAction.GetComponent<PlayerAction>();
-                //待機中なら
-                if (player.IsIdle() && !GetGimmickFlag()&& CountDown.GetCountDown()== CountDown.CountType.Nothing)
+                //待機中で、ギミックが動ていなくて、カウントダウンの値がなくて、滑る床による補完をしていない場合
+                if (player.IsIdle() && !GetGimmickFlag()&& CountDown.GetCountDown()== CountDown.CountType.Nothing && !player.IsSlideLerp())
                 {
                     //プレイヤーがいることを確認
                     if (player != null)
