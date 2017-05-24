@@ -111,6 +111,10 @@ public class CardManagement : MonoBehaviour {
     [SerializeField]
     int countNum;
 
+    private GameObject m_boardButton;
+    private GameObject[] card = null;
+    private int m_oldSelectCard;
+
     // Use this for initialization
     void Start () {
         isUpdateData = true;
@@ -181,6 +185,7 @@ public class CardManagement : MonoBehaviour {
 
         // MouseSystemコンポーネントの取得
         mouse_system = GameObject.Find("MouseSystem").GetComponent<MouseSystem>();
+        m_boardButton = GameObject.Find("BoardButton");
 
         gripFlag = false;
     }
@@ -539,7 +544,6 @@ public class CardManagement : MonoBehaviour {
     }
 
 
-    private GameObject[] card = null;
     void CloneCreate()
     {
         // ActionBoardの情報を取得
@@ -552,7 +556,7 @@ public class CardManagement : MonoBehaviour {
             {
                 card[i] = Instantiate(bord.cards[i].obj);
                 card[i].transform.parent = GameObject.Find("ActionBord").transform;
-                card[i].transform.position = bord.cards[i].obj.transform.position;
+                card[i].transform.localPosition = bord.cards[i].obj.transform.localPosition;
                 card[i].transform.localScale = bord.cards[i].obj.transform.localScale;
             }
         }
@@ -564,23 +568,27 @@ public class CardManagement : MonoBehaviour {
         CardBord bord = actionBord.GetComponent<CardBord>();
         int selectCard = mouse_system.GetMouseHit(bord.cards);
 
-        if (selectCard >= 0)
+        if (selectCard != m_oldSelectCard)
+            CleneDelete();
+
+        if (selectCard > 0)
         {
             CloneCreate();
             CardActive(false);
-            if (card[0].transform.position.x >= bord.cards[0].obj.transform.position.x - cardSize.x / 2)
+            if (card[0].transform.localPosition.x >= bord.cards[0].obj.transform.localPosition.x - cardSize.x / 2)
             {
                 for (int i = 0; i < selectCard; i++)
-                    card[i].transform.position += new Vector3(-5, 0, 0);
+                    card[i].transform.localPosition += new Vector3(-5, 0, 0);
 
                 for (int i = selectCard; i < bord.numSet; i++)
-                    card[i].transform.position += new Vector3(5, 0, 0);
+                    card[i].transform.localPosition += new Vector3(5, 0, 0);
             }
         }
         else
         {
             CleneDelete();
         }
+        m_oldSelectCard = selectCard;
     }
 
     void CleneDelete()
@@ -605,7 +613,6 @@ public class CardManagement : MonoBehaviour {
         {
             bord.cards[i].obj.SetActive(active);
         }
-        //GameObject.Find("BoardButton").SetActive(active);
+        m_boardButton.SetActive(active);
     }
-
 }
