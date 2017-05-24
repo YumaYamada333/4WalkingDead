@@ -123,7 +123,6 @@ public class GameManager : MonoBehaviour
         AudioSource audioSource = gameObject.GetComponent<AudioSource>();
         audioSource.PlayOneShot(OK);
     }
-
     public GameState GetGameState()
     {
         return gameState;

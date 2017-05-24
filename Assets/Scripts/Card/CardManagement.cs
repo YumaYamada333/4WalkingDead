@@ -193,8 +193,9 @@ public class CardManagement : MonoBehaviour {
         // データの更新
         if (isUpdateData) UpdateData();
 
-        // カード操作
-        if (isControlCard) ControlCard();
+        if (!GameObject.Find("GameManager").GetComponent<GameManager>().GetGimmickFlag())
+            // カード操作
+            if (isControlCard) ControlCard();
 
         // 所持カードの更新
         for (int i = 0; i < numCardSet; i++)
@@ -262,7 +263,7 @@ public class CardManagement : MonoBehaviour {
     void ControlCard()
     {
         // はさむカード選択中 ===============================================================
-        if (cursor == CursorForcusTag.HandsBord)
+        if (cursor == CursorForcusTag.HandsBord )
         {
             // 左クリックした座標にあるカードをつかむ
             if (Input.GetMouseButton(0))
