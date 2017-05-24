@@ -93,7 +93,7 @@ public class MouseSystem : MonoBehaviour {
                 // ボードのカード情報取得
                 CardManagement.CardData[] cards = GameObject.Find("CardManager").GetComponent<CardManagement>().cards;
 
-                for (int i = 0; i < cards.Length; i++)
+                for (int i = cards.Length - 1; i >= 0; i--)
                 {
                     if (cards[i].front.obj != null)
                     {
@@ -109,7 +109,7 @@ public class MouseSystem : MonoBehaviour {
                 // ボードのカード情報取得
                 CardBord.CardData[] cards = GameObject.Find("ActionBord").GetComponent<CardBord>().cards;
 
-                for (int i = 0; i < cards.Length; i++)
+                for (int i = cards.Length - 1; i >= 0; i--)
                 {
                     if (cards[i].obj != null)
                     {

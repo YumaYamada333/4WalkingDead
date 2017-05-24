@@ -198,8 +198,9 @@ public class CardManagement : MonoBehaviour {
         // データの更新
         if (isUpdateData) UpdateData();
 
-        // カード操作
-        if (isControlCard) ControlCard();
+        if (!GameObject.Find("GameManager").GetComponent<GameManager>().GetGimmickFlag())
+            // カード操作
+            if (isControlCard) ControlCard();
 
         // 所持カードの更新
         for (int i = 0; i < numCardSet; i++)
@@ -267,7 +268,7 @@ public class CardManagement : MonoBehaviour {
     void ControlCard()
     {
         // はさむカード選択中 ===============================================================
-        if (cursor == CursorForcusTag.HandsBord)
+        if (cursor == CursorForcusTag.HandsBord )
         {
             // 左クリックした座標にあるカードをつかむ
             if (Input.GetMouseButton(0))
@@ -549,15 +550,19 @@ public class CardManagement : MonoBehaviour {
         // ActionBoardの情報を取得
         CardBord bord = actionBord.GetComponent<CardBord>();
 
+        // カードのコピー
         if (card == null)
         {
-            card = new GameObject[bord.numSet];
-            for (int i = 0; i < bord.numSet; i++)
+            card = new GameObject[6];
+            for (int i = 0; i < card.Length; i++)
             {
-                card[i] = Instantiate(bord.cards[i].obj);
-                card[i].transform.parent = GameObject.Find("ActionBord").transform;
-                card[i].transform.localPosition = bord.cards[i].obj.transform.localPosition;
-                card[i].transform.localScale = bord.cards[i].obj.transform.localScale;
+                if (bord.cards[i].obj.activeSelf)
+                {
+                    card[i] = Instantiate(bord.cards[i].obj);
+                    card[i].transform.parent = GameObject.Find("ActionBord").transform;
+                    card[i].transform.localPosition = bord.cards[i].obj.transform.localPosition;
+                    card[i].transform.localScale = bord.cards[i].obj.transform.localScale;
+                }
             }
         }
     }
@@ -568,19 +573,24 @@ public class CardManagement : MonoBehaviour {
         CardBord bord = actionBord.GetComponent<CardBord>();
         int selectCard = mouse_system.GetMouseHit(bord.cards);
 
+        // 1フレーム前のはさむ場所と違う場合
         if (selectCard != m_oldSelectCard)
             CleneDelete();
 
-        if (selectCard > 0)
+        // はさむ範囲内
+        if (selectCard > 0 && selectCard < 6)
         {
+            // カードを複製
             CloneCreate();
+            // オリジナルカードを非表示
             CardActive(false);
+            // コピーカードの移動
             if (card[0].transform.localPosition.x >= bord.cards[0].obj.transform.localPosition.x - cardSize.x / 2)
             {
                 for (int i = 0; i < selectCard; i++)
                     card[i].transform.localPosition += new Vector3(-5, 0, 0);
 
-                for (int i = selectCard; i < bord.numSet; i++)
+                for (int i = selectCard; i < card.Length; i++)
                     card[i].transform.localPosition += new Vector3(5, 0, 0);
             }
         }
@@ -597,11 +607,13 @@ public class CardManagement : MonoBehaviour {
         CardBord bord = actionBord.GetComponent<CardBord>();
         if (card != null)
         {
+            // コピーカードの削除
             for (int i = 0; i < card.Length; i++)
             {
                 Destroy(card[i]);
             }
             card = null;
+            // オリジナルカードを元に戻す
             CardActive(true);
         }
     }
@@ -609,10 +621,28 @@ public class CardManagement : MonoBehaviour {
     void CardActive(bool active)
     {
         CardBord bord = actionBord.GetComponent<CardBord>();
-        for (int i = 0; i < bord.numSet; i++)
+
+        if (active)
         {
-            bord.cards[i].obj.SetActive(active);
+            for (int i = bord.usingCard; i < CardBord.numSetMax; i++)
+            {
+                if (bord.cards[i].obj == null) continue;
+                if (bord.cards[i].obj.transform.localPosition.x >=
+                    transform.localPosition.x + bord.GetComponent<RectTransform>().sizeDelta.x / 2 ||
+                    bord.cards[i].obj.transform.localPosition.x <=
+                    transform.localPosition.x - bord.GetComponent<RectTransform>().sizeDelta.x / 2)
+                {
+                    bord.cards[i].obj.SetActive(false);
+                }
+                else
+                {
+                    bord.cards[i].obj.SetActive(true);
+                }
+            }
         }
+        else for (int i = 0; i < bord.numSet; i++)
+                bord.cards[i].obj.SetActive(active);
+           
         m_boardButton.SetActive(active);
     }
 }
