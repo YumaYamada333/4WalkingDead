@@ -97,15 +97,8 @@ public class CardBord : MonoBehaviour {
         for (int i = 0; i < numSetMax; i++)
         {
             if (cards[i].obj == null) break;
-            ////カード選択時の座標変更
-            //if ((selectedSpace == i) && selectedSpace >= 0)
-            //{
-            //    cards[i].obj.transform.localPosition = new Vector3((i - centerCard) * cardSize.x, 0, -3f) / transform.localPosition.x;
-            //}
-            //else
-            //{
+
             cards[i].obj.transform.localPosition =
-                //new Vector3(cardSize.x / 2 + (i - centerCard) * cardSize.x - GetComponent<RectTransform>().sizeDelta.x / 2, 0.0f, zPos);
                 new Vector3(cardSize.x / 2 + (i - centerCard) * cardSize.x - GetComponent<RectTransform>().sizeDelta.x / 2 + scrollStep, 0.0f, zPos);
             //}
         }

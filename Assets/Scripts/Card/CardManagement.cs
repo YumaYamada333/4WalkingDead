@@ -34,7 +34,7 @@ public class CardManagement : MonoBehaviour {
     int numCardSet;
 
     // カード最大の所持数
-    public const int numMax = 99;  
+    public const int numMax = 99;
 
     // カードの種類
     public enum CardType
@@ -225,7 +225,7 @@ public class CardManagement : MonoBehaviour {
             {
                 DestroyCards(ref cards[i].front);
                 numCardSet--;
-                for (int j = i; j < numCardSet; j++)
+                for (int j = i; j < numCardSet + 1; j++)
                 {
                     cards[j] = cards[j + 1];
                 }
