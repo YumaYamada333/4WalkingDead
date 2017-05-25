@@ -27,7 +27,7 @@ public class ResetScript : MonoBehaviour
     private void Start()
     {
         //ボタンを非表示にしておく
-        gameObject.SetActive(false);
+        //gameObject.SetActive(false);
 
         //コンポーネントの取得
         bord = GameObject.Find("ActionBord").GetComponent<CardBord>();

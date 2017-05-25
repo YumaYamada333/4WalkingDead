@@ -41,32 +41,59 @@ public class Button : MonoBehaviour {
     [SerializeField]
     private Vector3 actPosActionBord = Vector3.zero;
 
+
+    MathClass lerp;
+
+    private GameObject imagebord;
+
+    private GameObject imagebord2;
+
+    private GameObject imagebord3;
+
+    private GameObject imagebord4;
+
+    private bool Move_flag;
+
+    private float m_autoMoveTime = 0.0f;
+
+    float timeStep;
+
+    float LerpMovement_x;
+    float LerpMovement_y1;
+    float LerpMovement_y2;
+    float LerpMovement_y3;
+
+
     // Use this for initialization
     void Awake ()
     {
         ActionBord = GameObject.Find("ActionBord");
         HandsBord = GameObject.Find("HandsBord");
-        //RetuneButton = GameObject.Find("RetuneButton");
-        //ResetButton = GameObject.Find("ResetButton");
         SpeedButton = GameObject.Find("SpeedButton");
         ExecutionButton = GameObject.Find("PlayButton");
         //リセットボタン
         ResetButton = GameObject.Find("Reset");
 
-        //SetPosition_x = 11.0f;
-        //SetPosition_y = 2.0f;
-        //SetPosition_z = 1.2f;
-        //BordPosition_x = 2.0f;
-        //BordPosition_y = -2.5f;
-        //BordPosition_z = 1.0f;
-        //position_Flag = false;
-        //if (mainCamera.activeSelf)
-        //{
-        //    RetuneButton.SetActive(false);
-        //    ResetButton.SetActive(false);
-        //    SpeedButton.SetActive(false);
-        //}
+        //上イメージボード
+        imagebord = GameObject.Find("Imagebord");
+        //下イメージボード
+        imagebord2 = GameObject.Find("Imagebord2");
 
+        //右イメージボード
+        imagebord3 = GameObject.Find("Imagebord3");
+
+        //左イメージボード
+        imagebord4 = GameObject.Find("Imagebord4");
+
+
+        //移動フラグ
+        Move_flag = true;
+
+        
+        m_autoMoveTime = Time.time+100;
+        
+        timeStep = 1;
+        
         // actionboardの配置
         ActionBord.transform.localPosition = actPosActionBord;
 
@@ -74,6 +101,12 @@ public class Button : MonoBehaviour {
         firstPos = mainCamera.transform.position;
 
         HandsBord.SetActive(false);
+
+        /*初期化*/
+        LerpMovement_x = 350.0f;
+        LerpMovement_y1 = 170.0f;
+        LerpMovement_y2 = 188.0f;
+        LerpMovement_y3 = 300.0f;
     }
 
     // Update is called once per frame
@@ -92,41 +125,51 @@ public class Button : MonoBehaviour {
         if (board.CheckRightEnd()) ScrollLeftButton.SetActive(false);
         else ScrollLeftButton.SetActive(true);
 
+        timeStep = (Time.time - m_autoMoveTime) /*/ 10.0f*/;
+        if (timeStep > 1.0f) timeStep = 1.0f;
+
+        MoveInLerp();
+        
     }
 
     public void OnClick()
     {
 
+        //timeStep = (Time.time - m_autoMoveTime);
+        m_autoMoveTime = Time.time;
         
+
 
         if (flag)
         {
             // カメラの切り替え　ボタンの配置
             flag = false;
             //position_Flag = true;
-            SpeedButton.SetActive(false);
-            ExecutionButton.SetActive(false);
+            //SpeedButton.SetActive(false);
+            //ExecutionButton.SetActive(false);
             //リセットボタン
-            ResetButton.SetActive(true);
+            //ResetButton.SetActive(true);
 
             //RetuneButton.SetActive(true);
-            //ResetButton.SetActive(true);
+            
 
             // boardの配置
             HandsBord.transform.localPosition = setPosHandsBord;
             ActionBord.transform.localPosition = setPosActionBord;
             // HandsBordを表示
             HandsBord.SetActive(true);
+
+            Move_flag = true;
         }
         else
         {
             flag = true;
             // カメラの切り替え　ボタンの配置
             //position_Flag = false;
-            SpeedButton.SetActive(true);
-            ExecutionButton.SetActive(true);
+            //SpeedButton.SetActive(true);
+            //ExecutionButton.SetActive(true);
             //リセットボタン
-            ResetButton.SetActive(false);
+            //ResetButton.SetActive(false);
 
             //RetuneButton.SetActive(false);
             //ResetButton.SetActive(false);
@@ -135,7 +178,82 @@ public class Button : MonoBehaviour {
             ActionBord.transform.localPosition = actPosActionBord;
 
             // HandsBordを非表示
-            HandsBord.SetActive(false);
+            //HandsBord.SetActive(false);
+
+            Move_flag = false;
+        }
+    }
+
+
+    //----------------------------------------------------------------------
+    //! @brief ボタンとボードのLerp処理
+    //!
+    //! @param[in] なし
+    //!
+    //! @return なし
+    //----------------------------------------------------------------------
+    void MoveInLerp()
+    {
+        if (Move_flag)
+        {
+            HandsBord.transform.localPosition =
+                MathClass.Lerp(new Vector3(0.0f, -LerpMovement_y3, 0),
+                new Vector3(0.0f, -LerpMovement_y2, 0), timeStep);
+
+
+            ResetButton.transform.localPosition = 
+                MathClass.Lerp(new Vector3(LerpMovement_x, -LerpMovement_y3, 0), 
+                new Vector3(350.0f, -LerpMovement_y2, 0), timeStep);
+
+
+            ActionBord.transform.localPosition = 
+                MathClass.Lerp(new Vector3(0.0f, -LerpMovement_y2, 0),
+                new Vector3(0.0f, LerpMovement_y1, 0), timeStep);
+
+
+            imagebord.transform.localPosition =
+                MathClass.Lerp(new Vector3(0.0f, -LerpMovement_y2, 0),
+                new Vector3(0.0f, LerpMovement_y1, 0), timeStep);
+
+
+            imagebord2.transform.localPosition =
+                MathClass.Lerp(new Vector3(0.0f, -LerpMovement_y3, 0), 
+                new Vector3(0.0f, -LerpMovement_y2, 0), timeStep);
+
+
+           
+
+
+        }
+        else
+        {
+            HandsBord.transform.localPosition = 
+                MathClass.Lerp(new Vector3(0.0f, -LerpMovement_y2, 0),
+                new Vector3(0.0f, -LerpMovement_y3, 0), timeStep);
+
+
+            ResetButton.transform.localPosition =
+                MathClass.Lerp(new Vector3(LerpMovement_x, -LerpMovement_y2, 0),
+                new Vector3(LerpMovement_x, -LerpMovement_y3, 0), timeStep);
+
+
+            ActionBord.transform.localPosition = 
+                MathClass.Lerp(new Vector3(0.0f, LerpMovement_y1, 0),
+                new Vector3(0.0f, -LerpMovement_y2, 0), timeStep);
+
+
+            imagebord.transform.localPosition = 
+                MathClass.Lerp(new Vector3(0.0f, LerpMovement_y1, 0), 
+                new Vector3(0.0f, -LerpMovement_y2, 0), timeStep);
+
+
+            imagebord2.transform.localPosition = 
+                MathClass.Lerp(new Vector3(0.0f, -LerpMovement_y2, 0),
+                new Vector3(0.0f, -LerpMovement_y3, 0), timeStep);
+
+
+           
+
         }
     }
 }

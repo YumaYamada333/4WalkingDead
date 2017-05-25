@@ -27,16 +27,25 @@ public class SceneLoadScript : MonoBehaviour
     //タイトル画面へ
     public void TitleSceneLoad()
     {
-        CurtainSystem = GameObject.Find("Canvas").GetComponent<CurtainControl>();
-        //カーテンを閉める
-        CurtainSystem.curtainOut();
+        if (SceneManager.GetActiveScene().name != "StageSelect")
+        {
+            CurtainControl CurtainSystem = GameObject.Find("Canvas").GetComponent<CurtainControl>();
+            //カーテンを閉める
+            CurtainSystem.curtainOut();
+        }
         //遷移先のシーンをロード
         Invoke("TitleScene", 2);
     }
     //ステージセレクト画面へ
     public void StageSelectSceneLoad()
     {
-        CurtainSystem = GameObject.Find("Canvas").GetComponent<CurtainControl>();
+
+        if (SceneManager.GetActiveScene().name != "Title")
+        {
+            CurtainControl CurtainSystem = GameObject.Find("Canvas").GetComponent<CurtainControl>();
+            //カーテンを閉める
+            CurtainSystem.curtainOut();
+        }
         //遷移先のシーンをロード
         Invoke("StageSelectScene", 2);
         //カーテンを閉める
