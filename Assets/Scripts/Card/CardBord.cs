@@ -360,30 +360,49 @@ public class CardBord : MonoBehaviour {
 
         if (Input.GetMouseButton(0) && canScroll)
         {
-            int num = (int)((mouse_system.GetDragVec().x - dragPos) / cardSize.x);
+            //int num = (int)((mouse_system.GetDragVec().x - dragPos) / cardSize.x);
+            //if (num != 0)
+            //{
+            //    dragPos = mouse_system.GetDragVec().x;
+            //    num %= 2;
+            //    if (num > 0)
+            //    {
+            //        for (int i = 0; i < num; i++)
+            //        {
+            //            if (CheckLeftEnd()) break;
+            //            ScrollToRight();
+            //        }
+            //    }
+            //    else if (num < 0)
+            //    {
+            //        for (int i = 0; i < -num; i++)
+            //        {
+            //            if (CheckRightEnd()) break;
+            //            ScrollToLeft();
+            //        }
+            //    }
+            //}
+            int num = (int)(MouseSystem.GetFlickDistance().x / cardSize.x);
             if (num != 0)
             {
                 dragPos = mouse_system.GetDragVec().x;
-
+                num %= 2;
                 if (num > 0)
                 {
-                    for (int i = 0; i < num; i++)
+                    if (!CheckRightEnd())
                     {
-                        if (CheckLeftEnd()) break;
-                        ScrollToRight();
+                        ScrollToLeft();
                     }
-
                 }
                 else if (num < 0)
                 {
-                    for (int i = 0; i < -num; i++)
+                        if (!CheckLeftEnd())
                     {
-                        if (CheckRightEnd()) break;
-                        ScrollToLeft();
+                        ScrollToRight();
                     }
-
                 }
             }
+
         }
     }
 
