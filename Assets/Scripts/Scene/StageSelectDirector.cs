@@ -98,8 +98,6 @@ public class StageSelectDirector : MonoBehaviour {
     // Update is called once per frame
     void Update ()
     {
-        // デバッグ用
-        if (Input.GetKey(KeyCode.RightArrow)) isEnd = true;
         if (isEnd != true) curtainUpStep += 0.01f;
         else curtainUpStep -= 0.01f;
         if (curtainUpStep > 1.0f) curtainUpStep = 1.0f;
@@ -143,7 +141,7 @@ public class StageSelectDirector : MonoBehaviour {
             {
                 changeStep = changeStep + stepSpd > 1.0f ? 1.0f : changeStep + stepSpd;
             }
-            Debug.Log(m_space[0].pamphlietIndex);
+            //Debug.Log(m_space[0].pamphlietIndex);
             // 何故かバグル
             //Debug.Log(m_selectPamphlet.Get());
 
