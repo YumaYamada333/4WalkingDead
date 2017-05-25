@@ -111,9 +111,14 @@ public class CardManagement : MonoBehaviour {
     [SerializeField]
     int countNum;
 
+    // BoardButton
     private GameObject m_boardButton;
+    // コピーカード
     private GameObject[] card = null;
+    // 前のはさむ場所
     private int m_oldSelectCard;
+    // 左端のカード
+    private int m_leftEdge = 0;
 
     // Use this for initialization
     void Start () {
@@ -550,22 +555,25 @@ public class CardManagement : MonoBehaviour {
         // ActionBoardの情報を取得
         CardBord bord = actionBord.GetComponent<CardBord>();
 
-        // カードのコピー
-        if (card == null)
-        {
-            card = new GameObject[6];
-            for (int i = 0; i < card.Length; i++)
+        //左端のオリジナルカードを取得
+        for (int i = 0; i < bord.cards.Length; i++)
+            if (bord.cards[i].obj.activeSelf)
             {
-                if (bord.cards[i].obj.activeSelf)
-                {
-                    card[i] = Instantiate(bord.cards[i].obj);
-                    card[i].transform.parent = GameObject.Find("ActionBord").transform;
-                    card[i].transform.localPosition = bord.cards[i].obj.transform.localPosition;
-                    card[i].transform.localScale = bord.cards[i].obj.transform.localScale;
-                }
+                m_leftEdge = i;
+                break;
             }
+
+        // カードのコピー
+        card = new GameObject[6];
+        for (int i = 0; i < card.Length; i++)
+        {
+            card[i] = Instantiate(bord.cards[m_leftEdge + i].obj);
+            card[i].transform.parent = GameObject.Find("ActionBord").transform;
+            card[i].transform.localPosition = bord.cards[m_leftEdge + i].obj.transform.localPosition;
+            card[i].transform.localScale = bord.cards[m_leftEdge + i].obj.transform.localScale;
         }
     }
+    
 
     void CloneMove()
     {
@@ -573,30 +581,29 @@ public class CardManagement : MonoBehaviour {
         CardBord bord = actionBord.GetComponent<CardBord>();
         int selectCard = mouse_system.GetMouseHit(bord.cards);
 
-        // 1フレーム前のはさむ場所と違う場合
+        // 前のはさむ場所と違う場合
         if (selectCard != m_oldSelectCard)
             CleneDelete();
 
         // はさむ範囲内
-        if (selectCard > 0 && selectCard < 6)
+        if (selectCard - m_leftEdge > 0 && selectCard - m_leftEdge < 6)
         {
-            // カードを複製
-            CloneCreate();
+            if (card == null)
+            {
+                // カードを複製
+                CloneCreate();
+            }
             // オリジナルカードを非表示
             CardActive(false);
             // コピーカードの移動
-            if (card[0].transform.localPosition.x >= bord.cards[0].obj.transform.localPosition.x - cardSize.x / 2)
+            if (card[0].transform.localPosition.x >= bord.cards[m_leftEdge].obj.transform.localPosition.x - cardSize.x / 2)
             {
-                for (int i = 0; i < selectCard; i++)
+                for (int i = 0; i < selectCard - m_leftEdge; i++)
                     card[i].transform.localPosition += new Vector3(-5, 0, 0);
 
-                for (int i = selectCard; i < card.Length; i++)
+                for (int i = selectCard - m_leftEdge; i < card.Length; i++)
                     card[i].transform.localPosition += new Vector3(5, 0, 0);
             }
-        }
-        else
-        {
-            CleneDelete();
         }
         m_oldSelectCard = selectCard;
     }
@@ -640,9 +647,11 @@ public class CardManagement : MonoBehaviour {
                 }
             }
         }
-        else for (int i = 0; i < bord.numSet; i++)
+        else
+        {
+            for (int i = 0; i < bord.numSet; i++)
                 bord.cards[i].obj.SetActive(active);
-           
+        }
         m_boardButton.SetActive(active);
     }
 }
