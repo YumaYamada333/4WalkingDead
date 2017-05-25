@@ -250,10 +250,6 @@ public class Button : MonoBehaviour {
             imagebord2.transform.localPosition = 
                 MathClass.Lerp(new Vector3(0.0f, -LerpMovement_y2, 0),
                 new Vector3(0.0f, -LerpMovement_y3, 0), timeStep);
-
-
-           
-
         }
     }
 }
