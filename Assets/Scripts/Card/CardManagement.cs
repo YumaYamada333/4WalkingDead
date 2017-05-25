@@ -555,14 +555,6 @@ public class CardManagement : MonoBehaviour {
         // ActionBoardの情報を取得
         CardBord bord = actionBord.GetComponent<CardBord>();
 
-        //左端のオリジナルカードを取得
-        for (int i = 0; i < bord.cards.Length; i++)
-            if (bord.cards[i].obj.activeSelf)
-            {
-                m_leftEdge = i;
-                break;
-            }
-
         // カードのコピー
         card = new GameObject[6];
         for (int i = 0; i < card.Length; i++)
@@ -581,10 +573,19 @@ public class CardManagement : MonoBehaviour {
         CardBord bord = actionBord.GetComponent<CardBord>();
         int selectCard = mouse_system.GetMouseHit(bord.cards);
 
+        //左端のオリジナルカードを取得
+        for (int i = 0; i < bord.cards.Length; i++)
+            if (bord.cards[i].obj.activeSelf)
+            {
+                m_leftEdge = i;
+                break;
+            }
+
         // 前のはさむ場所と違う場合
         if (selectCard != m_oldSelectCard)
             CleneDelete();
 
+            Debug.Log(m_leftEdge);
         // はさむ範囲内
         if (selectCard - m_leftEdge > 0 && selectCard - m_leftEdge < 6)
         {
