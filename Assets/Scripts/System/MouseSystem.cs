@@ -10,6 +10,9 @@ public class MouseSystem : MonoBehaviour {
     Vector2 touchPos;      // タッチ位置
     Vector2 dragVec;      // 移動ベクトル
 
+    static Vector2 touchStartPos;
+    static Vector2 touchEndPos;
+
     // Use this for initialization
     void Start ()
     {
@@ -41,6 +44,7 @@ public class MouseSystem : MonoBehaviour {
         }
         else dragVec = Vector2.zero;
 
+        Flick();
     }
     public Vector2 GetDragVec()
     {
@@ -82,6 +86,29 @@ public class MouseSystem : MonoBehaviour {
     public Vector3 GetWorldPos()
     {
         return world_pos;
+    }
+
+    Vector2 Flick()
+    {
+        // タッチ前の座標を取得
+        touchEndPos = touchStartPos;
+
+        // このフレームのタッチ座標
+        touchStartPos = Input.mousePosition;
+
+        // タッチをしていないなら(デバイスによって必要ない)
+        if (!Input.GetMouseButton(0))
+        {
+            touchEndPos = touchStartPos;
+        }
+
+        // スワイプ距離を算出
+        return touchEndPos - touchStartPos;
+    }
+
+    static public Vector2 GetFlickDistance(float free = 10.0f)
+    {
+        return Mathf.Abs((touchEndPos - touchStartPos).magnitude) < free ? new Vector2() : touchEndPos - touchStartPos;
     }
 
     public int GetMouseHit(GameObject board)

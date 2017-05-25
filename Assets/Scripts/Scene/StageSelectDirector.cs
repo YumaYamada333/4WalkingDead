@@ -105,13 +105,13 @@ public class StageSelectDirector : MonoBehaviour {
         
         // マウスのドラック量を取得
         Vector2 dragVec = GetComponent<MouseSystem>().GetDragVec() - dragVecOld;
-
+        // スワイプの距離を取得
         if (!(curtainUpStep < 1.0f))
         {
             // 切り替えが行われていない
             if (changeStep >= 1.0f)
             {
-                if (/*Input.GetKeyDown(KeyCode.DownArrow)*/dragVec.y < -30)
+                if (MouseSystem.GetFlickDistance().y > 30)
                 {
                     // 配置空間のパンフインデックスの更新
                     for (int i = 0; i < m_space.Length; i++)
@@ -123,7 +123,7 @@ public class StageSelectDirector : MonoBehaviour {
                     m_selectPamphlet.Plus(1);
                     changeStep = 0.0f;
                 }
-                else if (/*Input.GetKeyDown(KeyCode.UpArrow)*/dragVec.y > 30)
+                else if (MouseSystem.GetFlickDistance().y < -30)
                 {
                     m_selectPamphlet.Plus(-2);
                     // 配置空間のパンフインデックスの更新
