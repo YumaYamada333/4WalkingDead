@@ -588,11 +588,10 @@ public class CardManagement : MonoBehaviour {
         // はさむ範囲内
         if (selectCard - m_leftEdge > 0 && selectCard - m_leftEdge < 6)
         {
+            // カードを複製
             if (card == null)
-            {
-                // カードを複製
                 CloneCreate();
-            }
+
             // オリジナルカードを非表示
             CardActive(false);
             // コピーカードの移動
