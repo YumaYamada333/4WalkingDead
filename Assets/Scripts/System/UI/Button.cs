@@ -221,14 +221,7 @@ public class Button : MonoBehaviour {
                 new Vector3(0.0f, -LerpMovement_y2, 0), timeStep);
 
 
-            imagebord3.transform.localPosition =
-                MathClass.Lerp(new Vector3(LerpMovement_x + 6.0f, -LerpMovement_y3, 0), 
-                new Vector3(LerpMovement_x + 6.0f, 0.0f, 0), timeStep);
-
-
-            imagebord4.transform.localPosition =
-                MathClass.Lerp(new Vector3(-LerpMovement_x + -6.0f, -LerpMovement_y3, 0), 
-                new Vector3(-LerpMovement_x + -6.0f, 0.0f, 0), timeStep);
+           
 
 
         }
@@ -259,15 +252,7 @@ public class Button : MonoBehaviour {
                 new Vector3(0.0f, -LerpMovement_y3, 0), timeStep);
 
 
-            imagebord3.transform.localPosition = 
-                MathClass.Lerp(new Vector3(LerpMovement_x + 6.0f, 0.0f, 0),
-                new Vector3(LerpMovement_x + 6.0f, -LerpMovement_y3, 0), timeStep);
-
-
-            imagebord4.transform.localPosition = 
-                MathClass.Lerp(new Vector3(-LerpMovement_x + -6.0f, 0.0f, 0),
-                new Vector3(-LerpMovement_x + -6.0f, -LerpMovement_y3, 0), timeStep);
-
+           
 
         }
     }
