@@ -11,10 +11,14 @@ public class SceneLoadScript : MonoBehaviour
     public AudioClip OK;
     CurtainControl CurtainSystem;
     PlayerAction ButtonActive;
+    GameObject GameOver;
+    GameObject GameClear;
 
     void Start()
     {
         CurtainSystem = GameObject.Find("Canvas").GetComponent<CurtainControl>();
+        GameOver = GameObject.Find("OVER");
+        GameClear = GameObject.Find("CLEAR");
     }
     //----------------------------------------------------------------------
     //! @brief シーン遷移
@@ -92,5 +96,10 @@ public class SceneLoadScript : MonoBehaviour
         ButtonActive = GameObject.Find("unitychan").GetComponent<PlayerAction>();
         //ボタンを消す
         ButtonActive.SetButtonOff();
+    }
+    public void ResultActive()
+    {
+        GameOver.SetActive(false);
+        GameClear.SetActive(false);
     }
 }
